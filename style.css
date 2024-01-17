@@ -1,0 +1,138 @@
+:root{
+    --white: #f8f8f8;
+    --gray: #bfbfbf;
+    --black: #2f2f2f;
+    --red: #ff0000;
+    --green: #00ff00;
+    --blue: #0000FF;
+
+    --backgroundColor: var(--white);
+    --borderColor0: var(--black);
+    --borderColor1: var(--gray);
+    --borderColor01: #8f8f8f;
+    --empBorderColor: var(--red);
+
+    --upcomingColor: #ffe8e8;
+    --runningColor: #e8ffe8;
+    --recentColor: #e8e8ff;
+}
+body{
+    background-color: var(--backgroundColor);
+}
+
+header .selector{
+    margin: 3em 0 1em;
+    border-bottom: 1px solid var(--borderColor0);
+}
+header .selector ul{
+    margin: 0 auto 0 0;
+    display: flex;
+    justify-content: flex-start;
+}
+header .selector li{
+    margin: 0;
+    list-style-type: none;
+}
+header .selector .nav-item{
+    width: 10em;
+    height: 2em;
+    border-radius: 0.2em 0.2em 0 0;
+    position: relative;
+}
+header .selector p{
+    margin-top: 0.5em;
+    text-align: center;
+    /* position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); */
+}
+header .selector a{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+header .selector .nav-item {
+    border: 1px solid var(--borderColor1);
+    border-bottom: 1px solid var(--backgroundColor);
+}
+header .selector .active-box {
+    border: 1px solid var(--borderColor0);
+    border-bottom: 1px solid var(--backgroundColor);
+}
+header .selector .nav-item:hover{
+    border: 1px solid var(--empBorderColor);
+    border-bottom: 1px solid var(--backgroundColor);
+}
+
+
+main .conatiner{
+    width: 98%;
+    margin: auto;
+}
+main .listGroup{
+    position: relative;
+}
+main .listGroup a{
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 1px solid var(--borderColor0);
+    border-radius: 0.3em;
+}
+main .listGroup .listLink:hover{
+    border: 1px solid var(--empBorderColor);
+}
+main .listItem{
+    margin: 0.3em auto;
+    padding: 0 1em;
+    display: flex;
+    border-radius: 0.3em;
+    /* border: 1px solid var(--borderColor0); */
+}
+main .title{
+    width: 25%;
+    /* border: 1px solid var(--red); */
+}
+main .info{
+    margin: auto;
+    font-size: 0.8em;
+    width: 20%;
+    /* border: 1px solid var(--red); */
+}
+main .space{
+    width: 5%;
+}
+main #listContainer1 .listItem{
+    background-color: var(--upcomingColor);
+}
+main #listContainer2 .listItem{
+    background-color: var(--runningColor);
+}
+main #listContainer3 .listItem{
+    background-color: var(--recentColor);
+}
+
+
+main .table{
+    width: 100%;
+    margin-bottom: 1rem;
+    color: var(--black);
+    border-collapse: collapse;
+    text-indent: initial;
+    border-spacing: 2px;
+    line-height: 1.5;
+    border-radius: 10em;
+    border: 2px solid var(--borderColor01);
+}
+main .table th{
+    border: 2px solid var(--borderColor01);
+}
+main .table td{
+    border: 2px solid var(--borderColor01);
+}
