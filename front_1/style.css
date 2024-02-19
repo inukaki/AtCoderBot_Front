@@ -19,6 +19,10 @@
 body{
     background-color: var(--backgroundColor);
 }
+main {
+    width: 98%;
+    margin: auto;
+}
 
 header .selector{
     margin: 3em 0 1em;
@@ -68,10 +72,6 @@ header .selector .nav-item:hover{
 }
 
 
-main .conatiner{
-    width: 98%;
-    margin: auto;
-}
 main .listGroup{
     position: relative;
 }
@@ -93,17 +93,14 @@ main .listItem{
     padding: 0 1em;
     display: flex;
     border-radius: 0.3em;
-    /* border: 1px solid var(--borderColor0); */
 }
 main .title{
     width: 25%;
-    /* border: 1px solid var(--red); */
 }
 main .info{
     margin: auto;
     font-size: 0.8em;
     width: 20%;
-    /* border: 1px solid var(--red); */
 }
 main .space{
     width: 5%;
@@ -119,6 +116,15 @@ main #listContainer3 .listItem{
 }
 
 
+main .time{
+    display: flex;
+}
+main .time .timeS{
+    width: 4em;
+}
+main .members li{
+    list-style-type: decimal;
+}
 main .table{
     width: 100%;
     margin-bottom: 1rem;

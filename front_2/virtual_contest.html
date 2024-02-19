@@ -3,36 +3,82 @@
   <head>
     <title>Virtual Contest</title>
     <meta charset="UTF-8" />
-    <meta http-equiv="Content-Security-Policy" content="connect-src 'self' localhost:8000" />
+    <!-- <meta http-equiv="Content-Security-Policy" content="connect-src 'self' localhost:8000" /> -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="style.css" />
   </head>
-  <body id="create">
+  <body>
     <header>
       <h1>Virtual Contest</h1>
       <!-- ページ内リンク等のナビゲーション -->
-      <nav>
-        <div class="selector">
-          <ul class="nav nav-tabs">
-            <li class="nav-item">
-              <p>Contests</p>
-              <a class="nav-link" href="contestsList.html"></a>
-            </li>
-            <li class="nav-item active-box">
-              <p>Create</p>
-              <a class="nav-link active" href="create.html"></a>
-            </li>
-          </ul>
-        </div>
+      <nav class="selector">
+        <ul class="nav nav-tabs">
+          <li class="nav-item active-box">
+            <p>Contests</p>
+            <a class="nav-link active" href="virtual_contest.html#list"></a>
+          </li>
+          <li class="nav-item">
+            <p>Create</p>
+            <a class="nav-link" href="virtual_contest.html#create"></a>
+          </li>
+        </ul>
       </nav>
     </header>
     <main>
-      <section>
-        <label for="titleInput">Title:</label>
-        <input type="text" id="titleInput" placeholder="Title" value="New Contest">
+      <!-- list -->
+      <section id="list">
+        <div id="listContainer0" class="conatiner">
+          <div class="listGroup">
+            <a></a>
+            <div class="listItem">
+              <p class="title">Title</p>
+              <p class="space"></p>
+              <p class="info">Start</p>
+              <p class="space"></p>
+              <p class="info">End</p>
+              <p class="space"></p>
+              <p class="info">Members</p>
+            </div>
+          </div>
+        </div>
+        <div id="listContainer2" class="conatiner"><h3>Running Contests</h3></div>
+        <div id="listContainer1" class="conatiner"><h3>Upcoming Contests</h3></div>
+        <div id="listContainer3" class="conatiner"><h3>Recent Contests</h3></div>
       </section>
       <hr>
-      <section>
+      <!-- contest -->
+      <section id="contest">
+        <button onclick="getContest()">LOAD</button>
+        <div id="info"></div>
+        <h3>Problems</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Title</th>
+              <th>Point</th>
+            </tr>
+          </thead>
+          <tbody id="problemsBody"></tbody>
+        </table>
+        <h3>Ranking</h3>
+        <table class="table">
+          <thead>
+            <tr id="resultHeadRow">
+              <th></th>
+              <th>Name</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+      </section>
+      <hr>
+      <!-- create -->
+      <section id="create">
+        <label for="titleInput">Title:</label>
+        <input type="text" id="titleInput" placeholder="Title" value="New Contest">
+        <hr>
         Time
         <div>
           <label for="datetime">開始時刻:</label>
@@ -47,10 +93,8 @@
           <label for="datetime2">終了時刻:</label>
           <input type="datetime-local" id="datetime2" name="datetime2" value="" onchange="displayDuration()" required>
         </div>
-      </section>
-      <hr>
-      <section>
-        Members
+        <hr>
+        Member
         <div id="textBoxContainer">
           <div class="textBoxGroup">
             <input type="text" class="nameInput" id="textBox0">
@@ -61,9 +105,7 @@
           <button onclick="saveNameList()">SAVE</button>
           <button onclick="loadNameList()">LOAD</button>
         </div>
-      </section>
-      <hr>
-      <section>
+        <hr>
         Difficulty
         <div id="selectBoxContainer">
           <div class="selectBoxGroup">
@@ -82,17 +124,17 @@
         <div>
           <button onclick="addSelectBox()">+</button>
         </div>
-        <!-- <div>
-          <button onclick="pickDiffList()">PICK</button>
-        </div> -->
-      </section>
-      <hr>
-      <section>
+        <hr>
         <div>
           <button onclick="createContest()">Create</button>
         </div>
         <div id="createDisplay"></div>
+        <br>
       </section>
+      <br>
+      <br>
+      <br>
+      <br>
     </main>
       
     <script src="script.js"></script>

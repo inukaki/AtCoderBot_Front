@@ -1,4 +1,5 @@
 const apiUrl = 'http://localhost:8000/api';
+
 function formatTime(unixTime) {
     const date = new Date(unixTime * 1000);
     date.setHours(date.getHours() + 9);
@@ -16,10 +17,20 @@ function formatTime(unixTime) {
     return `${formattedDate} ${formattedTime} (${formattedDay})`;
 }
 
+function currentUnixTime() {
+    const currentDateTime = new Date();
+    const unixTime = Date.parse(currentDateTime) / 1000;
+    return unixTime;
+}
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 const existList = document.getElementById("contestsList");
 if (existList) {
     function getContestsList(){
+        console.log(`${apiUrl}/virtual_contests`);
         fetch(`${apiUrl}/virtual_contests`, {
+            // mode: 'no-cors',
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -111,8 +122,6 @@ if (existList) {
         });
     }
     getContestsList();
-}else{
-    console.log("Listないよ")
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -263,7 +272,7 @@ if (existCreate) {
         displayTime2();
     };
 
-    function getUnixTime() {
+    function unixTimeInput() {
         const selectedDateTime = document.getElementById("datetime").value;
         const unixTime = Date.parse(selectedDateTime) / 1000;
         
@@ -315,7 +324,7 @@ if (existCreate) {
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     function createContest(){
-        const startAt = getUnixTime();
+        const startAt = unixTimeInput();
         const durationSecond = document.getElementById("duration").value * 60;
         const title = document.getElementById("titleInput").value;
         const members = pickNameList();
@@ -336,6 +345,7 @@ if (existCreate) {
 
         // POSTリクエストを送信
         fetch(`${apiUrl}/virtual_contests`, {
+            // mode: 'no-cors',
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -352,8 +362,6 @@ if (existCreate) {
         notice = document.getElementById('createDisplay');
         notice.textContent = "Create Successfully!"
     }
-}else{
-    console.log("Createないよ")
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -364,14 +372,22 @@ if (existContest) {
     function getQueryParameter(parameterName) {
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
-      return urlParams.get(parameterName);
+      if (urlParams.get(parameterName)) {
+        return urlParams.get(parameterName);
+      } else {
+        return '1';
+      }
     }
 
     const virtualContestID = getQueryParameter("ID");
     console.log(virtualContestID);
 
+    let isDisplayProblem = false;
+
+    console.log(`${apiUrl}/virtual_contests/${virtualContestID}`);
     function getContest(){
         fetch(`${apiUrl}/virtual_contests/${virtualContestID}`, {
+            // mode: 'no-cors',
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -381,62 +397,81 @@ if (existContest) {
             .then(data => displayProblem(data))
             .catch(error => console.error('GET Error:', error.message));
     }
-    
-    function displayProblem(data) {
+
+    function displayInfo(data) {
         const startTime = data.startAt;
         const endTime = data.startAt + data.durationSecond;
+        const limitTime = endTime - currentUnixTime();
         const displayStartTime = formatTime(startTime);
         const displayEndTime = formatTime(endTime);
-        const members = data.members.map((listItem, index) => `<li>${index + 1}: ${listItem}</li>`).join('');
+        const displayLimitTime = formatTime(limitTime);
+        const members = data.members.map((listItem, index) => `<li>${listItem}</li>`).join('');
         info.innerHTML =`
-          <h2>${data.title}</h2>
-          <p>Start:${displayStartTime}</p>
-          <p>End:${displayEndTime}</p>
-          <h4>member</h4>
-          <p>${members}</p>
+            <h2>${data.title}</h2>
+            <div id="status"><div>
+            <div class="time">
+                <p class="timeS">Start:</p><p>${displayStartTime}</p>
+            </div>
+            <div class="time">
+                <p class="timeS">End:</p><p>${displayEndTime}</p>
+            </div>
+            <div class="time">
+                <p class="timeS">Limit:</p><p>${displayLimitTime}</p>
+            </div>
+            <h4>Member</h4>
+            <ul class="members">${members}</ul>
         `;
+    }
+    
+    function displayProblem(data) {
+        displayInfo(data);
 
-        const problemsBody = document.getElementById("problemsBody");
-        const problems = data.problems;
+        if(!isDisplayProblem){
+            const problemsBody = document.getElementById("problemsBody");
+            const problems = data.problems;
 
-        problems.forEach((problem, index) => {
-            const url = `https://atcoder.jp/contests/${problem.contestID}/tasks/${problem.problemID}`;
-            const newRow = document.createElement('tr');
+            problems.forEach((problem, index) => {
+                const url = `https://atcoder.jp/contests/${problem.contestID}/tasks/${problem.problemID}`;
+                const newRow = document.createElement('tr');
 
-            const newNum = document.createElement('th');
-            const newLink1 = document.createElement('a');
-            newLink1.href = url;
-            newLink1.rel = 'noopener';
-            newLink1.target = '_blank';
-            newLink1.textContent = index + 1;
-            newNum.appendChild(newLink1);
+                const newNum = document.createElement('th');
+                const newLink1 = document.createElement('a');
+                newLink1.href = url;
+                newLink1.rel = 'noopener';
+                newLink1.target = '_blank';
+                newLink1.textContent = index + 1;
+                newNum.appendChild(newLink1);
 
-            const newTitle = document.createElement('td');
-            const newLink2 = document.createElement('a');
-            newLink2.href = url;
-            newLink2.rel = 'noopener';
-            newLink2.target = '_blank';
-            newLink2.textContent = problem.name;
-            newTitle.appendChild(newLink2);
+                const newTitle = document.createElement('td');
+                const newLink2 = document.createElement('a');
+                newLink2.href = url;
+                newLink2.rel = 'noopener';
+                newLink2.target = '_blank';
+                newLink2.textContent = problem.name;
+                newTitle.appendChild(newLink2);
 
-            const newPoint = document.createElement('td');
-            newPoint.textContent = problem.point;
+                const newPoint = document.createElement('td');
+                newPoint.textContent = problem.point;
 
-            newRow.appendChild(newNum);
-            newRow.appendChild(newTitle);
-            newRow.appendChild(newPoint);
-            
-            problemsBody.appendChild(newRow);
+                newRow.appendChild(newNum);
+                newRow.appendChild(newTitle);
+                newRow.appendChild(newPoint);
+                
+                problemsBody.appendChild(newRow);
 
-            const resultHeadRow = document.getElementById("resultHeadRow");
-            const newHead = document.createElement('th');
-            newHead.textContent = index + 1;
-            resultHeadRow.appendChild(newHead);
-        });
+                const resultHeadRow = document.getElementById("resultHeadRow");
+                const newHead = document.createElement('th');
+                newHead.textContent = index + 1;
+                resultHeadRow.appendChild(newHead);
+            });
+            isDisplayProblem = true;
+        }
     }
 
+    console.log(`${apiUrl}/virtual_contests/standings/${virtualContestID}`);
     function getResult(){
         fetch(`${apiUrl}/virtual_contests/standings/${virtualContestID}`, {
+            // mode: 'no-cors',
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -530,6 +565,4 @@ if (existContest) {
     // ];
     // displayResult(dummyData);
 
-}else{
-    console.log("Contestないよ")
 }
