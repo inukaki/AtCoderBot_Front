@@ -23,7 +23,7 @@ function currentUnixTime() {
     return unixTime;
 }
 
-let view = 'list';
+let view = 'main';
 // urlの#によって表示する要素を変更
 window.addEventListener('hashchange', function() {
     var hash = window.location.hash.substring(1); // # を取り除く
@@ -37,7 +37,7 @@ window.addEventListener('hashchange', function() {
 
     // コンテンツの表示/非表示を切り替え
     if (hash === 'list') {
-        view = 'list';
+        view = 'main';
         list.style.display = 'block';
         contest.style.display = 'none';
         create.style.display = 'none';
@@ -49,14 +49,14 @@ window.addEventListener('hashchange', function() {
         create.style.display = 'none';
         console.log("#contest");
     } else if (hash === 'create') {
-        view = 'create';
+        view = 'main';
         list.style.display = 'none';
         contest.style.display = 'none';
         create.style.display = 'block';
         console.log("#create");
     } else {
         // ハッシュが未定義の場合や対応するものがない場合のデフォルト設定
-        view = 'list';
+        view = 'main';
         list.style.display = 'block';
         contest.style.display = 'none';
         create.style.display = 'none';
@@ -69,7 +69,7 @@ window.dispatchEvent(new Event('hashchange'));
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-if (view == 'list') {
+if (view == 'main') {
     console.log("#list2");
     
     function getContestsList(){
@@ -376,7 +376,7 @@ if (view == 'contest') {
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-if (view == 'create') {
+if (view == 'main') {
     console.log("#create2");
 
     function addTextBox() {
