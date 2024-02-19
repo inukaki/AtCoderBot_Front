@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <title>Virtual Contest</title>
+    <meta charset="UTF-8" />
+    <!-- <meta http-equiv="Content-Security-Policy" content="connect-src 'self' localhost:8000" /> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Virtual Contest</h1>
+      <!-- ページ内リンク等のナビゲーション -->
+      <nav class="selector">
+        <ul class="nav nav-tabs">
+          <li class="nav-item active-box">
+            <p>Contests</p>
+            <a class="nav-link active" href="virtual_contest.html#list"></a>
+          </li>
+          <li class="nav-item">
+            <p>Create</p>
+            <a class="nav-link" href="virtual_contest.html#create"></a>
+          </li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <!-- list -->
+      <section id="list">
+        <div id="listContainer0" class="conatiner">
+          <div class="listGroup">
+            <a></a>
+            <div class="listItem">
+              <p class="title">Title</p>
+              <p class="space"></p>
+              <p class="info">Start</p>
+              <p class="space"></p>
+              <p class="info">End</p>
+              <p class="space"></p>
+              <p class="info">Members</p>
+            </div>
+          </div>
+        </div>
+        <div id="listContainer2" class="conatiner"><h3>Running Contests</h3></div>
+        <div id="listContainer1" class="conatiner"><h3>Upcoming Contests</h3></div>
+        <div id="listContainer3" class="conatiner"><h3>Recent Contests</h3></div>
+      </section>
+      <hr>
+      <!-- contest -->
+      <section id="contest">
+        <button onclick="getContest()">LOAD</button>
+        <div id="info"></div>
+        <h3>Problems</h3>
+        <table class="table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Title</th>
+              <th>Point</th>
+            </tr>
+          </thead>
+          <tbody id="problemsBody"></tbody>
+        </table>
+        <h3>Ranking</h3>
+        <table class="table">
+          <thead>
+            <tr id="resultHeadRow">
+              <th></th>
+              <th>Name</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody id="resultBody"></tbody>
+        </table>
+      </section>
+      <hr>
+      <!-- create -->
+      <section id="create">
+        <label for="titleInput">Title:</label>
+        <input type="text" id="titleInput" placeholder="Title" value="New Contest">
+        <hr>
+        Time
+        <div>
+          <label for="datetime">開始時刻:</label>
+          <input type="datetime-local" id="datetime" name="datetime" value="" onchange="displayTime2()" required>
+        </div>
+        <div>
+          <label for="duration">制限時間:</label>
+          <input type="number" id="duration" name="duration" min="0" value="100" onchange="displayTime2()" style="width: 5em;">
+          分
+        </div>
+        <div>
+          <label for="datetime2">終了時刻:</label>
+          <input type="datetime-local" id="datetime2" name="datetime2" value="" onchange="displayDuration()" required>
+        </div>
+        <hr>
+        Member
+        <div id="textBoxContainer">
+          <div class="textBoxGroup">
+            <input type="text" class="nameInput" id="textBox0">
+          </div>
+        </div>
+        <button onclick="addTextBox()">+</button>
+        <div>
+          <button onclick="saveNameList()">SAVE</button>
+          <button onclick="loadNameList()">LOAD</button>
+        </div>
+        <hr>
+        Difficulty
+        <div id="selectBoxContainer">
+          <div class="selectBoxGroup">
+            <select class="selectDiff" id="selectBox0">
+              <option value="Gray">Gray</option>
+              <option value="Brown">Brown</option>
+              <option value="Green">Green</option>
+              <option value="Cyan">Cyan</option>
+              <option value="Blue">Blue</option>
+              <option value="Yellow">Yellow</option>
+              <option value="Orange">Orange</option>
+              <option value="Red">Red</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <button onclick="addSelectBox()">+</button>
+        </div>
+        <hr>
+        <div>
+          <button onclick="createContest()">Create</button>
+        </div>
+        <div id="createDisplay"></div>
+        <br>
+      </section>
+      <br>
+      <br>
+      <br>
+      <br>
+    </main>
+      
+    <script src="script.js"></script>
+  </body>
+</html>
