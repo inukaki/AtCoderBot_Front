@@ -25,6 +25,9 @@
       </nav>
     </header>
     <main>
+      <section id="right-bottom">
+        <div id="clock"></div>
+      </section>
       <!-- list -->
       <section id="list">
         <div id="listContainer0" class="conatiner">
@@ -33,11 +36,13 @@
             <div class="listItem">
               <p class="title">Title</p>
               <p class="space"></p>
-              <p class="info">Start</p>
+              <p class="time">Start</p>
               <p class="space"></p>
-              <p class="info">End</p>
+              <p class="time">End</p>
               <p class="space"></p>
-              <p class="info">Members</p>
+              <p class="memNum">Members</p>
+              <p class="space"></p>
+              <div class="diff">Difficulty</div>
             </div>
           </div>
         </div>
@@ -49,67 +54,185 @@
       <!-- contest -->
       <section id="contest">
         <button onclick="getContest()">LOAD</button>
-        <div id="info"></div>
+        <div class="switch-container">
+          <label class="switch-label" for="toggleEdit">
+            View
+            <label class="switch">
+              <input type="checkbox" id="toggleEdit" onchange="switchEdit()">
+              <span class="slider"></span>
+            </label>
+            Edit
+          </label>
+        </div>
+        <div class="edit">
+          <button onclick="editContest()">Go</button>
+        </div>
+        <div id="contestHead">
+          <!--  -->
+          <div class="view" id="contestTimes">
+            <h2>title</h2>
+            <div>
+              <div class="time">
+                <p class="timeS">Start:</p><p>startTime</p>
+              </div>
+              <div class="time">
+                <p class="timeS">End:</p><p>endTime</p>
+              </div>
+              <div id="limitTime" class="time">limit</div>
+            </div>
+          </div>
+          <!--  -->
+          <div class="edit">
+            <label for="editTitle">Title:</label>
+            <input type="text" id="editTitle" placeholder="Title" value="New Contest">
+            <hr>
+            Time
+            <div>
+              <label for="editStartTime">開始時刻:</label>
+              <input type="datetime-local" id="editStartTime" name="editStartTime" value="" onchange="timeAutoInput('edit', 'Start')" required>
+            </div>
+            <div>
+              <label for="editDurationTime">制限時間:</label>
+              <input type="number" id="editDurationTime" name="editDurationTime" min="0" value="100" onchange="timeAutoInput('edit', 'Duration')" style="width: 5em;">
+              分
+            </div>
+            <div>
+              <label for="editEndTime">終了時刻:</label>
+              <input type="datetime-local" id="editEndTime" name="editEndTime" value="" onchange="timeAutoInput('edit', 'End')" required>
+            </div>
+          </div>
+
+        </div>
+        <h4>Member</h4>
+        <div id="contestMember">
+          <!--  -->
+          <div class="view">
+            <ul id="members">members</ul>
+          </div>
+          <!--  -->
+          <div class="edit">
+            <div id="editNameBoxContainer">
+              <div class="editNameBoxGroup">
+                <input type="text" class="editName" id="editName0">
+              </div>
+            </div>
+            <button onclick="addDiv('editName')">+</button>
+          </div>
+
+        </div>
         <h3>Problems</h3>
-        <table class="table">
-          <thead>
-            <tr>
-              <th></th>
-              <th>Title</th>
-              <th>Point</th>
-            </tr>
-          </thead>
-          <tbody id="problemsBody"></tbody>
-        </table>
-        <h3>Ranking</h3>
-        <table class="table">
-          <thead>
-            <tr id="resultHeadRow">
-              <th></th>
-              <th>Name</th>
-              <th>Score</th>
-            </tr>
-          </thead>
-          <tbody id="resultBody"></tbody>
-        </table>
+        <div id="contestProblems">
+          <!--  -->
+          <div class="view">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Title</th>
+                  <th>Point</th>
+                </tr>
+              </thead>
+              <tbody id="problemsBody"></tbody>
+            </table>
+          </div>
+          <!--  -->
+          <div class="edit">
+            <div id="editProBoxContainer">
+              <div class="editProBoxGroup">
+                <div class="switch-container">
+                  <label class="switch-label" for="editProToggle0">
+                    Color
+                    <label class="switch">
+                      <input type="checkbox" class="editProToggle" id="editProToggle0" onchange="switchPro(0, 'editPro')">
+                      <span class="slider"></span>
+                    </label>
+                    ID
+                  </label>
+                </div>
+                <div class="diffSpace"></div>
+                <select class="editProSelect" id="editProSelect0">
+                  <option value="Gray">Gray</option>
+                  <option value="Brown">Brown</option>
+                  <option value="Green">Green</option>
+                  <option value="Cyan">Cyan</option>
+                  <option value="Blue">Blue</option>
+                  <option value="Yellow">Yellow</option>
+                  <option value="Orange">Orange</option>
+                  <option value="Red">Red</option>
+                </select>
+                <input type="text" class="editProText" placeholder="abc000_a" id="editProText0">
+              </div>
+            </div>
+            <div>
+              <button onclick="addDiv('editPro')">+</button>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="view">
+          <h3>Ranking</h3>
+          <table class="table">
+            <thead>
+              <tr id="resultHeadRow">
+                <th></th>
+                <th>Name</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody id="resultBody"></tbody>
+          </table>
+        </div>
+
       </section>
       <hr>
       <!-- create -->
       <section id="create">
-        <label for="titleInput">Title:</label>
-        <input type="text" id="titleInput" placeholder="Title" value="New Contest">
+        <label for="createTitle">Title:</label>
+        <input type="text" id="createTitle" placeholder="Title" value="New Contest">
         <hr>
         Time
         <div>
-          <label for="datetime">開始時刻:</label>
-          <input type="datetime-local" id="datetime" name="datetime" value="" onchange="displayTime2()" required>
+          <label for="createStartTime">開始時刻:</label>
+          <input type="datetime-local" id="createStartTime" name="createStartTime" value="" onchange="timeAutoInput('create', 'Start')" required>
         </div>
         <div>
-          <label for="duration">制限時間:</label>
-          <input type="number" id="duration" name="duration" min="0" value="100" onchange="displayTime2()" style="width: 5em;">
+          <label for="createDurationTime">制限時間:</label>
+          <input type="number" id="createDurationTime" name="createDurationTime" min="0" value="100" onchange="timeAutoInput('create', 'Duration')" style="width: 5em;">
           分
         </div>
         <div>
-          <label for="datetime2">終了時刻:</label>
-          <input type="datetime-local" id="datetime2" name="datetime2" value="" onchange="displayDuration()" required>
+          <label for="createEndTime">終了時刻:</label>
+          <input type="datetime-local" id="createEndTime" name="createEndTime" value="" onchange="timeAutoInput('create', 'End')" required>
         </div>
         <hr>
         Member
-        <div id="textBoxContainer">
-          <div class="textBoxGroup">
-            <input type="text" class="nameInput" id="textBox0">
+        <div id="createNameBoxContainer">
+          <div class="createNameBoxGroup">
+            <input type="text" class="createName" id="createName0">
           </div>
         </div>
-        <button onclick="addTextBox()">+</button>
+        <button onclick="addDiv('createName')">+</button>
         <div>
           <button onclick="saveNameList()">SAVE</button>
           <button onclick="loadNameList()">LOAD</button>
         </div>
         <hr>
-        Difficulty
-        <div id="selectBoxContainer">
-          <div class="selectBoxGroup">
-            <select class="selectDiff" id="selectBox0">
+        Problems
+        <div id="createProBoxContainer">
+          <div class="createProBoxGroup">
+            <div class="switch-container">
+              <label class="switch-label" for="createProToggle0">
+                Color
+                <label class="switch">
+                  <input type="checkbox" class="createProToggle" id="createProToggle0" onchange="switchPro(0, 'createPro')">
+                  <span class="slider"></span>
+                </label>
+                ID
+              </label>
+            </div>
+            <div class="diffSpace"></div>
+            <select class="createProSelect" id="createProSelect0">
               <option value="Gray">Gray</option>
               <option value="Brown">Brown</option>
               <option value="Green">Green</option>
@@ -119,10 +242,11 @@
               <option value="Orange">Orange</option>
               <option value="Red">Red</option>
             </select>
+            <input type="text" class="createProText" placeholder="abc000_a" id="createProText0">
           </div>
         </div>
         <div>
-          <button onclick="addSelectBox()">+</button>
+          <button onclick="addDiv('createPro')">+</button>
         </div>
         <hr>
         <div>
