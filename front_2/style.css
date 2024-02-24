@@ -15,13 +15,25 @@
     --upcomingColor: #ffe8e8;
     --runningColor: #e8ffe8;
     --recentColor: #e8e8ff;
+
+    --diffGray: #808080;
+    --diffBrown: #784315;
+    --diffGreen: #377e22;
+    --diffCyan: #56bdbf;
+    --diffBlue: #0000f5;
+    --diffYellow: #c0c03d;
+    --diffOrange: #ef8733;
+    --diffRed: #ea3323;
+    
+    --button-width: 48px;
+    --button-height: 24px;
+    --button-margin: calc(var(--button-height) / 10);
+
+    --displayView: block;
+    --displayEdit: none;
 }
 body{
     background-color: var(--backgroundColor);
-}
-main {
-    width: 98%;
-    margin: auto;
 }
 
 header .selector{
@@ -72,6 +84,120 @@ header .selector .nav-item:hover{
 }
 
 
+main{
+    width: 98%;
+    margin: auto;
+}
+main #right-bottom{
+    z-index: 100;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    margin: 2em;
+    /* width: 4em; */
+    /* height: 2em; */
+    border-radius: 1em;
+    border: 1px solid var(--borderColor0);
+    background-color: var(--white);
+    padding: 1em;
+}
+main #right-bottom #clock{
+    margin: auto;
+    font-size: 0.8em;
+}
+
+.diffGray{
+    background-color: var(--diffGray);
+}
+.diffBrown{
+    background-color: var(--diffBrown);
+}
+.diffGreen{
+    background-color: var(--diffGreen);
+}
+.diffCyan{
+    background-color: var(--diffCyan);
+}
+.diffBlue{
+    background-color: var(--diffBlue);
+}
+.diffYellow{
+    background-color: var(--diffYellow);
+}
+.diffOrange{
+    background-color: var(--diffOrange);
+}
+.diffRed{
+    background-color: var(--diffRed);
+}
+
+
+/* スライドボタンここから */
+.switch-container {
+    display: flex;
+    align-items: center;
+}
+
+.switch-label {
+    margin: auto 0;
+    cursor: pointer;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: var(--button-width);
+    height: var(--button-height);
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: .2s;
+    transition: .2s;
+    border-radius: calc(var(--button-height) / 2);
+    /* border: 1px solid var(--borderColor1); */
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: calc(var(--button-height) - var(--button-margin) * 2);
+    width: calc(var(--button-height) - var(--button-margin) * 2);
+    left: var(--button-margin);
+    bottom: var(--button-margin);
+    background-color: white;
+    -webkit-transition: .2s;
+    transition: .2s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #2196F3;
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+    -webkit-transform: translateX(calc(var(--button-width) - var(--button-height)));
+    -ms-transform: translateX(calc(var(--button-width) - var(--button-height)));
+    transform: translateX(calc(var(--button-width) - var(--button-height)));
+}
+/* スライドボタンここまで */
+
 main .listGroup{
     position: relative;
 }
@@ -88,43 +214,75 @@ main .listGroup a{
 main .listGroup .listLink:hover{
     border: 1px solid var(--empBorderColor);
 }
-main .listItem{
+main .listGroup .listItem{
     margin: 0.3em auto;
     padding: 0 1em;
     display: flex;
     border-radius: 0.3em;
 }
-main .title{
-    width: 25%;
-}
-main .info{
-    margin: auto;
-    font-size: 0.8em;
+main .listGroup .title{
     width: 20%;
 }
-main .space{
-    width: 5%;
+main .listGroup .time{
+    margin: auto;
+    font-size: 0.7em;
+    width: 15%;
 }
-main #listContainer1 .listItem{
+main .listGroup .memNum{
+    margin: auto;
+    font-size: 0.7em;
+    width: 2%;
+}
+main .listGroup .diff{
+    margin: auto;
+    font-size: 0.7em;
+    width: 25%;
+    display: flex;
+}main .listGroup .diff .diffBox{
+    margin: auto 0;
+    width: 3em;
+    height: 3em;
+    border: 1px solid var(--borderColor0);
+}
+main .listGroup .space{
+    width: 2%;
+}
+main .listGroup .upcomingContest{
     background-color: var(--upcomingColor);
 }
-main #listContainer2 .listItem{
+main .listGroup .runningContest{
     background-color: var(--runningColor);
 }
-main #listContainer3 .listItem{
+main .listGroup .recentContest{
     background-color: var(--recentColor);
 }
 
 
-main .time{
+.view{
+    display: var(--displayView);
+}
+.edit{
+    display: var(--displayEdit);
+}
+
+/* #contestHead{
+    height: 14em;
+} */
+main #contestHead .time{
     display: flex;
 }
-main .time .timeS{
-    width: 4em;
+main #contestHead .time .timeS{
+    width: 6em;
 }
-main .members li{
+/* #contestMember{
+    height: 10em;
+} */
+main #members li{
     list-style-type: decimal;
 }
+/* #contestProblems{
+    height: 20em;
+} */
 main .table{
     width: 100%;
     margin-bottom: 1rem;
@@ -141,4 +299,32 @@ main .table th{
 }
 main .table td{
     border: 2px solid var(--borderColor01);
+}
+main .proLink{
+    background-color: #ffffffbb;
+}
+
+
+.createProBoxGroup{
+    display: flex;
+}
+.editProBoxGroup{
+    display: flex;
+}
+.diffSpace{
+    width: 2em;
+}
+.createProSelect{
+    display: block;
+}
+.createProText{
+    display: none;
+    width: 6em;
+}
+.editProSelect{
+    display: block;
+}
+.editProText{
+    display: none;
+    width: 6em;
 }

@@ -1,16 +1,28 @@
 const apiUrl = 'http://localhost:8000/api';
 
+let acquiredData;
+function saveData(data){
+    acquiredData = data;
+    console.log("↓data");
+    console.log(acquiredData);
+
+    if (code == 'main'){
+        displayContestsList(acquiredData);
+    }else if (code == 'contest'){
+        displayContest(acquiredData);
+    }
+}
+
 function formatTime(unixTime) {
     const date = new Date(unixTime * 1000);
-    date.setHours(date.getHours() + 9);
 
-    const formattedDate = date.getUTCFullYear() + '-' +
-        ('0' + (date.getUTCMonth() + 1)).slice(-2) + '-' +
-        ('0' + date.getUTCDate()).slice(-2);
+    const formattedDate = date.getFullYear() + '-' +
+        ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
+        ('0' + date.getDate()).slice(-2);
     
-    const formattedTime = ('0' + date.getUTCHours()).slice(-2) + ':' +
-        ('0' + date.getUTCMinutes()).slice(-2) + ':' +
-        ('0' + date.getUTCSeconds()).slice(-2);
+    const formattedTime = ('0' + date.getHours()).slice(-2) + ':' +
+        ('0' + date.getMinutes()).slice(-2) + ':' +
+        ('0' + date.getSeconds()).slice(-2);
     
     const formattedDay = date.toLocaleDateString('en-US', { weekday: 'short' });
     
@@ -23,7 +35,40 @@ function currentUnixTime() {
     return unixTime;
 }
 
-let view = 'main';
+function secondsToDDHHMMSS(seconds) {
+    const absSeconds = Math.abs(seconds);
+    const days = Math.floor(absSeconds / 86400);
+    const hours = Math.floor((absSeconds % 86400) / 3600);
+    const minutes = Math.floor((absSeconds % 3600) / 60);
+    const remainingSeconds = absSeconds % 60;
+
+    const formattedMinutes = String(minutes).padStart(2, '0');
+    const formattedHours = String(hours).padStart(2, '0');
+    const formattedSeconds = String(remainingSeconds).padStart(2, '0');
+
+    let formattedTime;
+    if (days == 0) {
+        formattedTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+    }else{
+        formattedTime = `${days}日と ${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+    }
+
+    return seconds < 0 ? `-${formattedTime}` : formattedTime;
+}
+
+function displayRightBottomTime(unixTime){
+    const clock = document.getElementById("clock");
+    clock.innerHTML = formatTime(unixTime);
+}
+displayRightBottomTime(currentUnixTime());
+
+setInterval(() => {
+    displayRightBottomTime(currentUnixTime());
+    // console.log(formatTime(currentUnixTime()));
+}, 200);
+
+
+let code = 'main';
 // urlの#によって表示する要素を変更
 window.addEventListener('hashchange', function() {
     var hash = window.location.hash.substring(1); // # を取り除く
@@ -37,26 +82,26 @@ window.addEventListener('hashchange', function() {
 
     // コンテンツの表示/非表示を切り替え
     if (hash === 'list') {
-        view = 'main';
+        code = 'main';
         list.style.display = 'block';
         contest.style.display = 'none';
         create.style.display = 'none';
         console.log("#list");
     } else if (hash === 'contest') {
-        view = 'contest';
+        code = 'contest';
         list.style.display = 'none';
         contest.style.display = 'block';
         create.style.display = 'none';
         console.log("#contest");
     } else if (hash === 'create') {
-        view = 'main';
+        code = 'main';
         list.style.display = 'none';
         contest.style.display = 'none';
         create.style.display = 'block';
         console.log("#create");
     } else {
         // ハッシュが未定義の場合や対応するものがない場合のデフォルト設定
-        view = 'main';
+        code = 'main';
         list.style.display = 'block';
         contest.style.display = 'none';
         create.style.display = 'none';
@@ -67,9 +112,259 @@ window.addEventListener('hashchange', function() {
 // 初回読み込み時も処理を実行
 window.dispatchEvent(new Event('hashchange'));
 
+
+function diffToColor(difficulty){
+    switch (true) {
+        case 2800 <= difficulty:
+            return "Red";
+        case 2400 <= difficulty:
+            return "Orange";
+        case 2000 <= difficulty:
+            return "Yellow";
+        case 1600 <= difficulty:
+            return "Blue";
+        case 1200 <= difficulty:
+            return "Cyan";
+        case 800 <= difficulty:
+            return "Green";
+        case 400 <= difficulty:
+            return "Brown";
+        case 0 <= difficulty:
+            return "Gray";
+        default:
+            return "Gray";
+    }
+}
+
+
+function listBox(contestData){
+    const currentTime = currentUnixTime();
+    const startTime = contestData.startAt;
+    const endTime = contestData.startAt + contestData.durationSecond;
+
+    const newListBox = document.createElement('div');
+    newListBox.classList.add('listGroup');
+    let itemClass;
+    if (currentTime < startTime) {
+        itemClass = "upcomingContest";
+    } else if (currentTime < endTime){
+        itemClass = "runningContest";
+    } else {
+        itemClass = "recentContest";
+    }
+
+    let diffBox = "";
+    const problems = contestData.problems;
+    problems.forEach(problem => {
+        diffBox += `<div class="diffBox diff${diffToColor(problem.difficulty)}"></div>`;
+    });
+
+    newListBox.innerHTML = `
+        <a class="listLink" href="virtual_contest.html?ID=${contestData.virtualContestID}#contest"></a>
+        <div class="listItem ${itemClass}">
+            <p class="title">${contestData.title}</p>
+            <p class="space"></p>
+            <p class="time">${formatTime(startTime)}</p>
+            <p class="space"></p>
+            <p class="time">${formatTime(endTime)}</p>
+            <p class="space"></p>
+            <p class="memNum">${contestData.members.length}</p>
+            <p class="space"></p>
+            <div class="diff">${diffBox}</div>
+        </div>
+    `;
+
+    return newListBox;
+}
+
+
+function timeAutoInput(place = "create", type = "Start"){
+    const startTime = document.getElementById(`${place}StartTime`).value;
+    const durationTime = document.getElementById(`${place}DurationTime`).value;
+    const endTime = document.getElementById(`${place}EndTime`).value;
+    const unixStartTime = Date.parse(startTime) / 1000;
+    const unixEndTime = Date.parse(endTime) / 1000;
+    if(type == "Start" || type == "Duration"){
+        let durationSecond;
+        if(durationTime){
+            durationSecond = durationTime * 60;
+        }else{
+            durationSecond = 0;
+            document.getElementById(`${place}DurationTime`).value = 0;
+        }
+        const convertedDateTime = new Date((unixStartTime + durationSecond) * 1000);
+        const year = convertedDateTime.getFullYear();
+        const month = (convertedDateTime.getMonth() + 1).toString().padStart(2, '0');
+        const day = convertedDateTime.getDate().toString().padStart(2, '0');
+        const hours = convertedDateTime.getHours().toString().padStart(2, '0');
+        const minutes = convertedDateTime.getMinutes().toString().padStart(2, '0');
+        document.getElementById(`${place}EndTime`).value = `${year}-${month}-${day}T${hours}:${minutes}`;
+    }else if(type == "End"){
+        let durationSecond = unixEndTime - unixStartTime;
+        if(durationSecond >= 0){
+            document.getElementById(`${place}DurationTime`).value = durationSecond / 60;
+        }else{
+            durationSecond = 0;
+            document.getElementById(`${place}DurationTime`).value = durationSecond / 60;
+            timeAutoInput(`${place}`,'Duration');
+        }
+    }
+}
+let addDivIndex = {
+    "createName": 0,
+    "createPro": 0,
+    "editName": 0,
+    "editPro": 0
+}
+function addDiv(type = "createName"){
+    const container = document.getElementById(`${type}BoxContainer`);
+    addDivIndex[type] ++;
+    const divIndex = addDivIndex[type];
+    
+    const newBoxGroup = document.createElement('div');
+    newBoxGroup.classList.add(`${type}BoxGroup`);
+    if(type == "createName" || type == "editName"){
+        newBoxGroup.innerHTML = `
+            <input type="text" class="${type}" id="${type}${divIndex}">
+            <button onclick="removeDiv(this, '${type}')">-</button>
+        `;
+    }else if(type == "createPro" || type == "editPro"){
+        newBoxGroup.innerHTML = `
+            <div class="switch-container">
+                <label class="switch-label" for="${type}Toggle${divIndex}">
+                    Color
+                    <label class="switch">
+                        <input type="checkbox" class="${type}Toggle" id="${type}Toggle${divIndex}" onchange="switchPro(${divIndex}, '${type}')">
+                        <span class="slider"></span>
+                    </label>
+                    ID
+                </label>
+            </div>
+            <div class="diffSpace"></div>
+            <select class="${type}Select" id="${type}Select${divIndex}">
+                <option value="Gray">Gray</option>
+                <option value="Brown">Brown</option>
+                <option value="Green">Green</option>
+                <option value="Cyan">Cyan</option>
+                <option value="Blue">Blue</option>
+                <option value="Yellow">Yellow</option>
+                <option value="Orange">Orange</option>
+                <option value="Red">Red</option>
+            </select>
+            <input type="text" class="${type}Text" placeholder="abc000_a" id="${type}Text${divIndex}">
+            <button onclick="removeDiv(this, '${type}')">-</button>
+        `;
+    }
+    container.appendChild(newBoxGroup);
+}
+function removeDiv(button, type = "createName"){
+    const container = document.getElementById(`${type}BoxContainer`);
+    const group = button.parentNode;
+    container.removeChild(group);
+}
+function switchPro(proBoxId = 0, type = "createPro"){
+    const togglePro = document.getElementById(`${type}Toggle${proBoxId}`).checked;
+    const selectBox = document.getElementById(`${type}Select${proBoxId}`);
+    const textBox = document.getElementById(`${type}Text${proBoxId}`);
+    if(togglePro){
+        selectBox.style.display = "none";
+        textBox.style.display = "block";
+    }else{
+        selectBox.style.display = "block";
+        textBox.style.display = "none";
+    }
+}
+function autoInput(data, place = "create"){
+    document.getElementById(`${place}Title`).value = data.title;
+
+    if(place == "edit"){
+        const convertedDateTime = new Date(data.startAt * 1000);
+        const year = convertedDateTime.getFullYear();
+        const month = (convertedDateTime.getMonth() + 1).toString().padStart(2, '0');
+        const day = convertedDateTime.getDate().toString().padStart(2, '0');
+        const hours = convertedDateTime.getHours().toString().padStart(2, '0');
+        const minutes = convertedDateTime.getMinutes().toString().padStart(2, '0');
+        document.getElementById(`${place}StartTime`).value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        document.getElementById(`${place}DurationTime`).value = data.durationSecond / 60;
+        timeAutoInput(`${place}`, 'Start');
+    }
+
+    let nameBoxes = document.querySelectorAll(`.${place}NameBoxGroup`);
+    const members = data.members;
+    while(nameBoxes.length < members.length){
+        addDiv(`${place}Name`);
+        nameBoxes = document.querySelectorAll(`.${place}NameBoxGroup`);
+    }
+    const names = document.querySelectorAll(`.${place}Name`);
+    names.forEach((name, index) => {
+        name.value = members[index];
+    });
+    
+    let proBoxes = document.querySelectorAll(`.${place}ProBoxGroup`);
+    const problems = data.problems;
+    console.log(problems);
+    while(proBoxes.length < problems.length){
+        addDiv(`${place}Pro`);
+        proBoxes = document.querySelectorAll(`.${place}ProBoxGroup`);
+    }
+    const toggles = document.querySelectorAll(`.${place}ProToggle`);
+    const selects = document.querySelectorAll(`.${place}ProSelect`);
+    const texts = document.querySelectorAll(`.${place}ProText`);
+    if(place == "edit"){
+        toggles.forEach((toggle, index) => {
+            toggle.checked = true;
+            switchPro(index, `${place}Pro`);
+        });
+    }
+    texts.forEach((text, index) => {
+        text.value = problems[index].problemID;
+    });
+    selects.forEach((select, index) => {
+        select.value = diffToColor(problems[index].difficulty);
+    });
+}
+function pickData(place = "create"){
+    const startTime = document.getElementById(`${place}StartTime`).value;
+    const startAt = Date.parse(startTime) / 1000;
+    const durationSecond = document.getElementById(`${place}DurationTime`).value * 60;
+    const title = document.getElementById(`${place}Title`).value;
+
+    const members = [];
+    const names = document.querySelectorAll(`.${place}Name`);
+    names.forEach(name => {
+        members.push(name.value);
+    });
+    const problems = [];
+    const proBoxes = document.querySelectorAll(`.${place}ProBoxGroup`);
+    proBoxes.forEach(proBox => {
+        const togglePro = proBox.getElementsByClassName(`${place}ProToggle`)[0].checked;
+        const color = proBox.getElementsByClassName(`${place}ProSelect`)[0].value;
+        const text = proBox.getElementsByClassName(`${place}ProText`)[0].value;
+        if(!togglePro || text == ""){
+            problems.push(color);
+        }else{
+            problems.push(text);
+        }
+    });
+
+    const data = {
+        "startAt": startAt,
+        "durationSecond": durationSecond,
+        "title": title,
+        "visible": "All",
+        "serverID": "100000812800000000",
+        "members": members,
+        "problems": problems
+    };
+    console.log("Pick Data", data);
+    return data;
+}
+
+
+
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-if (view == 'main') {
+if (code == 'main') {
     console.log("#list2");
     
     function getContestsList(){
@@ -82,12 +377,12 @@ if (view == 'main') {
             },
         })
             .then(response => response.json())
-            .then(data => displayContestsList(data))
+            .then(data => saveData(data))
             .catch(error => console.error('GET Error:', error.message));
     }
 
     function displayContestsList(data) {
-        const currentTime = Math.floor(Date.now() / 1000);
+        const currentTime = currentUnixTime();
         const container1 = document.getElementById("listContainer1");
         const container2 = document.getElementById("listContainer2");
         const container3 = document.getElementById("listContainer3");
@@ -95,75 +390,20 @@ if (view == 'main') {
         data.sort((a, b) => a.startAt - b.startAt);
 
         data.forEach(item => {
+            console.log(item);
+
             const startTime = item.startAt;
             const endTime = item.startAt + item.durationSecond;
-            const displayTime = formatTime(startTime);
-            const displayTime2 = formatTime(endTime);
-            const displayPeople = item.members.length;
 
-            const newListGroup = document.createElement('div');
-            newListGroup.classList.add('listGroup');
-            
-            const newLink = document.createElement('a');
-            newLink.href = `virtual_contest.html?ID=${item.virtualContestID}#contest`;
-            newLink.classList.add('listLink');
-            const newItem = document.createElement('div');
-            newItem.classList.add('listItem');
+            const newListBox = listBox(item);
 
-            const newTitle = document.createElement('p');
-            newTitle.classList.add('title');
-            newTitle.textContent = `${item.title}`;
-            newItem.appendChild(newTitle);
-
-            const newSpace1 = document.createElement('p');
-            newSpace1.classList.add('space');
-            newItem.appendChild(newSpace1);
-
-            const newInfo1 = document.createElement('p');
-            newInfo1.classList.add('info');
-            newInfo1.textContent = `${displayTime}`;
-            newItem.appendChild(newInfo1);
-
-            const newSpace2 = document.createElement('p');
-            newSpace2.classList.add('space');
-            newItem.appendChild(newSpace2);
-            
-            const newInfo2 = document.createElement('p');
-            newInfo2.classList.add('info');
-            newInfo2.textContent = `${displayTime2}`;
-            newItem.appendChild(newInfo2);
-
-            const newSpace3 = document.createElement('p');
-            newSpace3.classList.add('space');
-            newItem.appendChild(newSpace3);
-            
-            const newInfo3 = document.createElement('p');
-            newInfo3.classList.add('info');
-            newInfo3.textContent = `${displayPeople}`;
-            newItem.appendChild(newInfo3);
-
-            newListGroup.appendChild(newLink);
-            newListGroup.appendChild(newItem);
             if (currentTime < startTime) {
-                container1.appendChild(newListGroup);
+                container1.appendChild(newListBox);
             } else if (currentTime < endTime){
-                container2.appendChild(newListGroup);
+                container2.appendChild(newListBox);
             } else {
-                container3.appendChild(newListGroup);
+                container3.appendChild(newListBox);
             }
-            
-            // <div class="listGroup">
-            //     <a class="listLink" href="virtual_contest.html?ID=0#contest"></a>
-            //     <div class="listItem">
-            //         <p class="title">Title</p>
-            //         <p class="space"></p>
-            //         <p class="info">Start</p>
-            //         <p class="space"></p>
-            //         <p class="info">End</p>
-            //         <p class="space"></p>
-            //         <p class="info">Members</p>
-            //     </div>
-            // </div>
         });
     }
     getContestsList();
@@ -171,7 +411,7 @@ if (view == 'main') {
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-if (view == 'contest') {
+if (code == 'contest') {
     console.log("#contest2");
 
     // クエリパラメータを取得する関数
@@ -189,10 +429,8 @@ if (view == 'contest') {
     const virtualContestID = getQueryParameter("ID");
     console.log(virtualContestID);
 
-    let isDisplayProblem = false;
-
-    console.log(`${apiUrl}/virtual_contests/${virtualContestID}`);
     function getContest(){
+        console.log(`${apiUrl}/virtual_contests/${virtualContestID}`);
         fetch(`${apiUrl}/virtual_contests/${virtualContestID}`, {
             // mode: 'no-cors',
             method: 'GET',
@@ -201,82 +439,79 @@ if (view == 'contest') {
             },
         })
             .then(response => response.json())
-            .then(data => displayProblem(data))
+            .then(data => saveData(data))
             .catch(error => console.error('GET Error:', error.message));
     }
 
-    function displayInfo(data) {
+    function displayLimit(data){
+        const currentTime = currentUnixTime();
         const startTime = data.startAt;
         const endTime = data.startAt + data.durationSecond;
-        const limitTime = endTime - currentUnixTime();
-        const displayStartTime = formatTime(startTime);
-        const displayEndTime = formatTime(endTime);
-        const displayLimitTime = formatTime(limitTime);
-        const members = data.members.map((listItem, index) => `<li>${listItem}</li>`).join('');
-        info.innerHTML =`
-            <h2>${data.title}</h2>
-            <div id="status"><div>
-            <div class="time">
-                <p class="timeS">Start:</p><p>${displayStartTime}</p>
-            </div>
-            <div class="time">
-                <p class="timeS">End:</p><p>${displayEndTime}</p>
-            </div>
-            <div class="time">
-                <p class="timeS">Limit:</p><p>${displayLimitTime}</p>
-            </div>
-            <h4>Member</h4>
-            <ul class="members">${members}</ul>
-        `;
+
+        let limitContent;
+        if (currentTime < startTime) {
+            limitContent = `<p class="timeS">開始まで:</p><p>${secondsToDDHHMMSS(startTime-currentTime)}</p>`;
+        } else if (currentTime < endTime){
+            limitContent = `<p class="timeS">終了まで:</p><p>${secondsToDDHHMMSS(endTime-currentTime)}</p>`;
+        } else {
+            limitContent = `<p class="timeS">終了から:</p><p>${secondsToDDHHMMSS(currentTime-endTime)}</p>`;
+        }
+        limitTime.innerHTML = `${limitContent}`;
     }
     
-    function displayProblem(data) {
-        displayInfo(data);
+    function displayContest(data) {
+        const startTime = data.startAt;
+        const endTime = data.startAt + data.durationSecond;
+        
+        contestTimes.innerHTML =`
+            <h2>${data.title}</h2>
+            <div>
+                <div class="time">
+                    <p class="timeS">Start:</p><p>${formatTime(startTime)}</p>
+                </div>
+                <div class="time">
+                    <p class="timeS">End:</p><p>${formatTime(endTime)}</p>
+                </div>
+                <div id="limitTime" class="time"></div>
+            </div>
+        `;
+        members.innerHTML = `${data.members.map((listItem, index) => `<li>${listItem}</li>`).join('')}`;
 
-        if(!isDisplayProblem){
-            const problemsBody = document.getElementById("problemsBody");
-            const problems = data.problems;
+        displayLimit(acquiredData);
+        setInterval(() => {
+            displayLimit(acquiredData);
+        }, 200);
 
-            problems.forEach((problem, index) => {
-                const url = `https://atcoder.jp/contests/${problem.contestID}/tasks/${problem.problemID}`;
-                const newRow = document.createElement('tr');
+        const problemsBody = document.getElementById("problemsBody");
+        const resultHeadRow = document.getElementById("resultHeadRow");
+        problemsBody.innerHTML = "";
+        resultHeadRow.innerHTML = "<th></th><th>Name</th><th>Score</th>";
 
-                const newNum = document.createElement('th');
-                const newLink1 = document.createElement('a');
-                newLink1.href = url;
-                newLink1.rel = 'noopener';
-                newLink1.target = '_blank';
-                newLink1.textContent = index + 1;
-                newNum.appendChild(newLink1);
+        const problems = data.problems;
+        problems.forEach((problem, index) => {
+            const url = `https://atcoder.jp/contests/${problem.contestID}/tasks/${problem.problemID}`;
+            const newRow = document.createElement('tr');
+            newRow.innerHTML = `
+                <th class="diff${diffToColor(problem.difficulty)}">
+                    <a href="${url}" rel="noopener" target="_blank" class="proLink">${index + 1}</a>
+                </th>
+                <td>
+                    <a href="${url}" rel="noopener" target="_blank">${problem.name}</a>
+                </td>
+                <td>${problem.point}</td>
+            `;
+            
+            problemsBody.appendChild(newRow);
 
-                const newTitle = document.createElement('td');
-                const newLink2 = document.createElement('a');
-                newLink2.href = url;
-                newLink2.rel = 'noopener';
-                newLink2.target = '_blank';
-                newLink2.textContent = problem.name;
-                newTitle.appendChild(newLink2);
-
-                const newPoint = document.createElement('td');
-                newPoint.textContent = problem.point;
-
-                newRow.appendChild(newNum);
-                newRow.appendChild(newTitle);
-                newRow.appendChild(newPoint);
-                
-                problemsBody.appendChild(newRow);
-
-                const resultHeadRow = document.getElementById("resultHeadRow");
-                const newHead = document.createElement('th');
-                newHead.textContent = index + 1;
-                resultHeadRow.appendChild(newHead);
-            });
-            isDisplayProblem = true;
-        }
+            const newHead = document.createElement('th');
+            newHead.textContent = index + 1;
+            resultHeadRow.appendChild(newHead);
+        });
+        autoInput(data, 'edit');
     }
 
-    console.log(`${apiUrl}/virtual_contests/standings/${virtualContestID}`);
     function getResult(){
+        console.log(`${apiUrl}/virtual_contests/standings/${virtualContestID}`);
         fetch(`${apiUrl}/virtual_contests/standings/${virtualContestID}`, {
             // mode: 'no-cors',
             method: 'GET',
@@ -294,17 +529,11 @@ if (view == 'contest') {
 
         data.forEach((member, index) => {
             const newRow = document.createElement('tr');
-
-            const newNum = document.createElement('th');
-            newNum.textContent = index + 1;
-            const newName = document.createElement('td');
-            newName.textContent = member.atcoderID;
-            const newScore = document.createElement('td');
-            newScore.textContent = member.point;
-
-            newRow.appendChild(newNum);
-            newRow.appendChild(newName);
-            newRow.appendChild(newScore);
+            newRow.innerHTML = `
+                <th>${index + 1}</th>
+                <td>${member.atcoderID}</td>
+                <td>${member.point}</td>
+            `;
             
             const problems = member.problems;
             
@@ -322,6 +551,17 @@ if (view == 'contest') {
     }
     getContest();
     getResult();
+
+    function switchEdit(){
+        const toggleEdit = document.getElementById("toggleEdit").checked;
+        if(toggleEdit){
+            document.documentElement.style.setProperty('--displayView',"none");
+            document.documentElement.style.setProperty('--displayEdit',"block");
+        }else{
+            document.documentElement.style.setProperty('--displayView',"block");
+            document.documentElement.style.setProperty('--displayEdit',"none");
+        }
+    }
 
     // const dummyData = [
     //     {
@@ -372,139 +612,50 @@ if (view == 'contest') {
     // ];
     // displayResult(dummyData);
 
+    
+    function editContest(){
+        // POSTリクエストを送信
+        fetch(`${apiUrl}/virtual_contests/${virtualContestID}`, {
+            // mode: 'no-cors',
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(pickData('edit')),
+        })
+            .then(response => response.json())
+            .then(data => editSuccess(data))
+            .catch(error => console.error('POST Error:', error));
+    }
+    function editSuccess(data){
+        window.location.reload();
+    }
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-if (view == 'main') {
+if (code == 'main') {
     console.log("#create2");
 
-    function addTextBox() {
-        const textBoxContainer = document.getElementById('textBoxContainer');
-        const textBoxGroups = document.querySelectorAll('.textBoxGroup');
 
-        // Create a new text box group
-        const newTextBoxGroup = document.createElement('div');
-        newTextBoxGroup.classList.add('textBoxGroup');
-        // Create a new text box
-        const newTextBox = document.createElement('input');
-        newTextBox.type = 'text';
-        newTextBox.classList.add('nameInput');
-        const textBoxId = 'textBox' + textBoxGroups.length;
-        newTextBox.id = textBoxId;
-        // Create a new remove button
-        const removeButton = document.createElement('button');
-        removeButton.textContent = '-';
-        removeButton.onclick = function() { removeTextBox(this); };
-        // Append the new text box and remove button to the new text box group
-        newTextBoxGroup.appendChild(newTextBox);
-        newTextBoxGroup.appendChild(removeButton);
-        // Append the new text box group to the container
-        textBoxContainer.appendChild(newTextBoxGroup);
-    }
-    addTextBox();
-    addTextBox();
-
-    function removeTextBox(button) {
-        const textBoxContainer = document.getElementById('textBoxContainer');
-        const textBoxGroup = button.parentNode;
-        // Remove the text box group
-        textBoxContainer.removeChild(textBoxGroup);
+    function saveContestData(data){
+        console.log("Save Data:", data);
+        sessionStorage.setItem('myContestData', JSON.stringify(data));
     }
 
-    function fillTextBoxes(values) {
-        let textBoxes = document.querySelectorAll('.nameInput');
-    
-        // Ensure there are enough text boxes
-        while (textBoxes.length < values.length) {
-        addTextBox();
-        textBoxes = document.querySelectorAll('.nameInput');
-        }
-    
-        // Fill text boxes with values
-        textBoxes.forEach((textBox, index) => {
-        // Set the value from the array or use an empty string if the array is undefined
-        textBox.value = values ? values[index] || '' : '';
-        });
-    }
-
-    function pickNameList() {
-        const textBoxes = document.querySelectorAll('.nameInput');
-        const values = [];
-
-        textBoxes.forEach(textBox => {
-        values.push(textBox.value);
-        });
-        console.log("Pick Values:", values);
-        return values;
-    }
-    function saveNameList() {
-        const values = pickNameList();
-        console.log("Save Values:", values);
-        sessionStorage.setItem('myNameList', JSON.stringify(values));
-    }
-
-    function loadNameList(){
-        var myNameValues = JSON.parse(sessionStorage.getItem('myNameList'));
-        console.log("Load Values:", myNameValues);
-        if(myNameValues){
-            fillTextBoxes(myNameValues);
+    function loadContestData(){
+        var myContestData = JSON.parse(sessionStorage.getItem('myContestData'));
+        console.log("Load Data:", myContestData);
+        if(myContestData){
+            autoInput(myContestData, 'create');
+        }else{
+            addDiv('createName');
+            addDiv('createName');
+            addDiv('createPro');
+            addDiv('createPro');
         }
     }
-    loadNameList();
-
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    
-    function addSelectBox() {
-        const selectBoxContainer = document.getElementById('selectBoxContainer');
-        const selectBoxGroups = document.querySelectorAll('.selectBoxGroup');
-
-        // Create a new select box group
-        const newSelectBoxGroup = document.createElement('div');
-        newSelectBoxGroup.classList.add('selectBoxGroup');
-        // Create a new select box
-        const newSelectBox = document.createElement('select');
-        newSelectBox.classList.add('selectDiff');
-        const selectBoxId = 'selectBox' + selectBoxGroups.length;
-        newSelectBox.id = selectBoxId;
-        difficulties = ["Gray", "Brown", "Green", "Cyan", "Blue", "Yellow", "Orange", "Red"];
-        difficulties.forEach(diff => {
-            const initialOption = document.createElement('option');
-            initialOption.value = diff;
-            initialOption.textContent = diff;
-            newSelectBox.appendChild(initialOption);
-        })
-
-        // Create a new remove button
-        const removeButton = document.createElement('button');
-        removeButton.textContent = '-';
-        removeButton.onclick = function() { removeSelectBox(this); };
-        // Append the new select box and remove button to the new select box group
-        newSelectBoxGroup.appendChild(newSelectBox);
-        newSelectBoxGroup.appendChild(removeButton);
-        // Append the new select box group to the container
-        selectBoxContainer.appendChild(newSelectBoxGroup);
-    }
-
-    function removeSelectBox(button) {
-        const selectBoxContainer = document.getElementById('selectBoxContainer');
-        const selectBoxGroup = button.parentNode;
-        // Remove the select box group
-        selectBoxContainer.removeChild(selectBoxGroup);
-    }
-
-    function pickDiffList() {
-        const selectBoxes = document.querySelectorAll('.selectDiff');
-        const values = [];
-
-        selectBoxes.forEach(selectBox => {
-            values.push(selectBox.value);
-        });
-        console.log("Pick Values:", values);
-        return values;
-    }
-    addSelectBox();
-    addSelectBox();
+    loadContestData();
 
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -519,81 +670,13 @@ if (view == 'main') {
         const minutes = currentDateTime.getMinutes().toString().padStart(2, '0');
 
         // 現在時刻をフォーマットして設定
-        document.getElementById("datetime").value = `${year}-${month}-${day}T${hours}:${minutes}`;
-        displayTime2();
+        document.getElementById("createStartTime").value = `${year}-${month}-${day}T${hours}:${minutes}`;
+        timeAutoInput('create', 'Start');
     };
-
-    function unixTimeInput() {
-        const selectedDateTime = document.getElementById("datetime").value;
-        const unixTime = Date.parse(selectedDateTime) / 1000;
-        
-        return unixTime;
-    }
-
-    function displayDuration(){
-        // 日付時刻を取得
-        const selectedDateTime1 = document.getElementById("datetime").value;
-        const selectedDateTime2 = document.getElementById("datetime2").value;
-        // Unix Timeに変換
-        const unixTime1 = Date.parse(selectedDateTime1) / 1000;
-        const unixTime2 = Date.parse(selectedDateTime2) / 1000;
-
-        // 終了時刻が開始時刻よりも前とならないように
-        let durationSecond = unixTime2 - unixTime1;
-        if(durationSecond >= 0){
-            document.getElementById("duration").value = durationSecond / 60;
-        }else{
-            durationSecond = 0;
-            document.getElementById("duration").value = durationSecond / 60;
-            displayTime2();
-        }
-    }
-
-    function displayTime2(){
-        const durationMinute = document.getElementById("duration").value;
-        if (durationMinute) {
-            durationSecond = durationMinute * 60
-        }else{
-            durationSecond = 0;
-            document.getElementById("duration").value = 0;
-        }
-        // 1. 日付時刻を取得
-        const changedDateTime = document.getElementById("datetime").value;
-        // 2. Unix Timeに変換
-        const unixTime = (Date.parse(changedDateTime) / 1000) + durationSecond;
-        // 4. Unix Timeを日付時刻に変換
-        const convertedDateTime = new Date(unixTime * 1000);
-        // console.log(convertedDateTime);
-        const year = convertedDateTime.getFullYear();
-        const month = (convertedDateTime.getMonth() + 1).toString().padStart(2, '0');
-        const day = convertedDateTime.getDate().toString().padStart(2, '0');
-        const hours = convertedDateTime.getHours().toString().padStart(2, '0');
-        const minutes = convertedDateTime.getMinutes().toString().padStart(2, '0');
-        document.getElementById("datetime2").value = `${year}-${month}-${day}T${hours}:${minutes}`;
-    }
     
     //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     function createContest(){
-        const startAt = unixTimeInput();
-        const durationSecond = document.getElementById("duration").value * 60;
-        const title = document.getElementById("titleInput").value;
-        const members = pickNameList();
-        const problems = pickDiffList();
-
-        // JSONオブジェクトを組み立て
-        const requestData = {
-            "startAt": startAt,
-            "durationSecond": durationSecond,
-            "title": title,
-            "visible": "All",
-            "serverID": "100000888800000000",
-            "members": members,
-            "problems": problems
-        };
-
-        console.log(requestData);
-
         // POSTリクエストを送信
         fetch(`${apiUrl}/virtual_contests`, {
             // mode: 'no-cors',
@@ -601,16 +684,20 @@ if (view == 'main') {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(requestData),
+            body: JSON.stringify(pickData('create')),
         })
             .then(response => response.json())
             // .then(data => console.log('POST Response:', data))
-            .then(createSuccess())
+            .then(data => createSuccess(data))
             .catch(error => console.error('POST Error:', error));
     }
 
-    function createSuccess() {
-        notice = document.getElementById('createDisplay');
-        notice.textContent = "Create Successfully!"
+    function createSuccess(data) {
+        saveContestData(data);
+        const notice = document.getElementById('createDisplay');
+        const newP = document.createElement('p');
+        newP.innerHTML = 'Create Successfully!';
+        notice.appendChild(newP);
+        notice.appendChild(listBox(data));
     }
 }
