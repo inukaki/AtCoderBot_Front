@@ -46,6 +46,71 @@
             </div>
           </div>
         </div>
+        <div id="listContainer000" class="conatiner">
+          <div class="listGroup">
+            <div class="listItem">
+              <div class="title">
+                <div class="sort-filter">
+                  <label for="sortTitle">Sort:</label>
+                  <select class="sort-filter-input" id="sortTitle" onchange="displayContestsList('sort', 'title')">
+                    <option value="none">none</option>
+                    <option value="a-z">a-z</option>
+                    <option value="z-a">z-a</option>
+                  </select>
+                </div>
+              </div>
+              <p class="space"></p>
+              <div class="time">
+                <div class="sort-filter">
+                  <select class="sort-filter-input" id="sortStart" onchange="displayContestsList('sort', 'start')">
+                    <option value="none">none</option>
+                    <option value="0-9">0-9</option>
+                    <option value="9-0">9-0</option>
+                  </select>
+                </div>
+              </div>
+              <p class="space"></p>
+              <div class="time">
+                <div class="sort-filter">
+                  <select class="sort-filter-input" id="sortEnd" onchange="displayContestsList('sort', 'end')">
+                    <option value="none">none</option>
+                    <option value="0-9">0-9</option>
+                    <option value="9-0">9-0</option>
+                  </select>
+                </div>
+              </div>
+              <p class="space"></p>
+              <div class="memNum"></div>
+              <p class="space"></p>
+              <div class="diff"></div>
+            </div>
+            <div class="listItem">
+              <div class="title">
+                <div class="sort-filter">
+                  <label for="filterSearch">Search:</label>
+                  <input type="text" class="sort-filter-input" id="filterSearch" placeholder="Keyword" onchange="displayContestsList()">
+                </div>
+              </div>
+              <p class="space"></p>
+              <p class="time">←正規表現使えます</p>
+              <p class="space"></p>
+              <div class="time">
+                <div class="sort-filter">
+                  <label for="filterVisible">Visible:</label>
+                  <select class="sort-filter-input" id="filterVisible" onchange="displayContestsList()">
+                    <option value="none">none</option>
+                    <option value="All">All</option>
+                    <option value="discordOnly">discordOnly</option>
+                  </select>
+                </div>
+              </div>
+              <p class="space"></p>
+              <p class="memNum"></p>
+              <p class="space"></p>
+              <div class="diff"></div>
+            </div>
+          </div>
+        </div>
         <div id="listContainer2" class="conatiner"><h3>Running Contests</h3></div>
         <div id="listContainer1" class="conatiner"><h3>Upcoming Contests</h3></div>
         <div id="listContainer3" class="conatiner"><h3>Recent Contests</h3></div>
@@ -113,7 +178,7 @@
           <div class="edit">
             <div id="editNameBoxContainer">
               <div class="editNameBoxGroup">
-                <input type="text" class="editName" id="editName0">
+                <input type="text" class="editName" id="editName0" placeholder="AtCoderID">
               </div>
             </div>
             <button onclick="addDiv('editName')">+</button>
@@ -209,14 +274,14 @@
         Member
         <div id="createNameBoxContainer">
           <div class="createNameBoxGroup">
-            <input type="text" class="createName" id="createName0">
+            <input type="text" class="createName" id="createName0" placeholder="AtCoderID">
           </div>
         </div>
         <button onclick="addDiv('createName')">+</button>
-        <div>
+        <!-- <div>
           <button onclick="saveNameList()">SAVE</button>
           <button onclick="loadNameList()">LOAD</button>
-        </div>
+        </div> -->
         <hr>
         Problems
         <div id="createProBoxContainer">
