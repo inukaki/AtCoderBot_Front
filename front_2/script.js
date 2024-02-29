@@ -3,11 +3,11 @@ const apiUrl = 'http://localhost:8000/api';
 let acquiredData;
 function saveData(data){
     acquiredData = data;
-    console.log("↓data");
-    console.log(acquiredData);
+    console.log("Acquired Data", acquiredData);
 
     if (code == 'main'){
-        displayContestsList(acquiredData);
+        document.getElementById("sortStart").value = "0-9";
+        displayContestsList('sort', 'start');
     }else if (code == 'contest'){
         displayContest(acquiredData);
     }
@@ -225,7 +225,7 @@ function addDiv(type = "createName"){
     newBoxGroup.classList.add(`${type}BoxGroup`);
     if(type == "createName" || type == "editName"){
         newBoxGroup.innerHTML = `
-            <input type="text" class="${type}" id="${type}${divIndex}">
+            <input type="text" class="${type}" id="${type}${divIndex}" placeholder="AtCoderID">
             <button onclick="removeDiv(this, '${type}')">-</button>
         `;
     }else if(type == "createPro" || type == "editPro"){
@@ -302,7 +302,6 @@ function autoInput(data, place = "create"){
     
     let proBoxes = document.querySelectorAll(`.${place}ProBoxGroup`);
     const problems = data.problems;
-    console.log(problems);
     while(proBoxes.length < problems.length){
         addDiv(`${place}Pro`);
         proBoxes = document.querySelectorAll(`.${place}ProBoxGroup`);
@@ -361,6 +360,96 @@ function pickData(place = "create"){
 }
 
 
+let sortTag = 'start';
+function convertData(data, method = 'filter', keyword = ''){
+    const sortTitle = document.getElementById("sortTitle");
+    const sortStart = document.getElementById("sortStart");
+    const sortEnd = document.getElementById("sortEnd");
+    const filterSearch = document.getElementById("filterSearch");
+    const filterVisible = document.getElementById("filterVisible");
+
+    if(method == 'sort'){
+        sortTag = keyword;
+    }
+
+    let newData = data;
+    // newData = newData.filter(item => item.visible == "All");
+    // newData = newData.filter(item => item.title.includes(filterSearch.value));
+    const regex = new RegExp(filterSearch.value, "i");
+    newData = newData.filter(item => JSON.stringify(item.title).match(regex));
+
+    if(filterVisible.value != "none"){
+        newData = newData.filter(item => item.visible == filterVisible.value);
+    }
+
+    if(sortTag == 'title'){
+        // sortTitle.value = "none";
+        sortStart.value = "none";
+        sortEnd.value = "none";
+        if(sortTitle.value == "a-z"){
+            newData.sort((a, b) => a.title.localeCompare(b.title));
+        }else if(sortTitle.value == "z-a"){
+            newData.sort((a, b) => b.title.localeCompare(a.title));
+        }else if(sortTitle.value == "none"){
+            sortStart.value = "0-9";
+            newData.sort((a, b) => a.startAt - b.startAt);
+        }
+    }else if(sortTag == 'start'){
+        sortTitle.value = "none";
+        // sortStart.value = "none";
+        sortEnd.value = "none";
+        if(sortStart.value == "0-9"){
+            newData.sort((a, b) => a.startAt - b.startAt);
+        }else if(sortStart.value == "9-0"){
+            newData.sort((a, b) => b.startAt - a.startAt);
+        }else if(sortStart.value == "none"){
+            sortStart.value = "0-9";
+            newData.sort((a, b) => a.startAt - b.startAt);
+        }
+    }else if(sortTag == 'end'){
+        sortTitle.value = "none";
+        sortStart.value = "none";
+        // sortEnd.value = "none";
+        if(sortEnd.value == "0-9"){
+            newData.sort((a, b) => (a.startAt + a.durationSecond) - (b.startAt + b.durationSecond));
+        }else if(sortEnd.value == "9-0"){
+            newData.sort((a, b) => (b.startAt + b.durationSecond) - (a.startAt + a.durationSecond));
+        }else if(sortEnd.value == "none"){
+            sortStart.value = "0-9";
+            newData.sort((a, b) => a.startAt - b.startAt);
+        }
+    }
+    console.log('NewData', newData);
+    return newData;
+}
+
+function displayContestsList(method = 'filter', keyword = '') {
+    listContainer1.innerHTML = "<h3>Upcoming Contests</h3>";
+    listContainer2.innerHTML = "<h3>Running Contests</h3>";
+    listContainer3.innerHTML = "<h3>Recent Contests</h3>";
+    const currentTime = currentUnixTime();
+    const container1 = document.getElementById("listContainer1");
+    const container2 = document.getElementById("listContainer2");
+    const container3 = document.getElementById("listContainer3");
+
+    convertData(acquiredData, method, keyword).forEach(item => {
+        // console.log(item);
+
+        const startTime = item.startAt;
+        const endTime = item.startAt + item.durationSecond;
+
+        const newListBox = listBox(item);
+
+        if (currentTime < startTime) {
+            container1.appendChild(newListBox);
+        } else if (currentTime < endTime){
+            container2.appendChild(newListBox);
+        } else {
+            container3.appendChild(newListBox);
+        }
+    });
+}
+
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -379,32 +468,6 @@ if (code == 'main') {
             .then(response => response.json())
             .then(data => saveData(data))
             .catch(error => console.error('GET Error:', error.message));
-    }
-
-    function displayContestsList(data) {
-        const currentTime = currentUnixTime();
-        const container1 = document.getElementById("listContainer1");
-        const container2 = document.getElementById("listContainer2");
-        const container3 = document.getElementById("listContainer3");
-
-        data.sort((a, b) => a.startAt - b.startAt);
-
-        data.forEach(item => {
-            console.log(item);
-
-            const startTime = item.startAt;
-            const endTime = item.startAt + item.durationSecond;
-
-            const newListBox = listBox(item);
-
-            if (currentTime < startTime) {
-                container1.appendChild(newListBox);
-            } else if (currentTime < endTime){
-                container2.appendChild(newListBox);
-            } else {
-                container3.appendChild(newListBox);
-            }
-        });
     }
     getContestsList();
 }
@@ -562,6 +625,9 @@ if (code == 'contest') {
             document.documentElement.style.setProperty('--displayEdit',"none");
         }
     }
+    setTimeout(() => {
+        switchEdit();
+    }, 8);
 
     // const dummyData = [
     //     {
