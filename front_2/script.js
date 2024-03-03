@@ -13,6 +13,17 @@ function saveData(data){
     }
 }
 
+function escapeHTML(target){
+    let result = target;
+    result = result.replaceAll("&", "&amp;");
+    result = result.replaceAll("<", "&lt;");
+    result = result.replaceAll(">", "&gt;");
+    result = result.replaceAll('"', "&quot;");
+    result = result.replaceAll("'", "&#39;");
+    result = result.replaceAll("`", "&#96;");
+    return result;
+}
+
 function formatTime(unixTime) {
     const date = new Date(unixTime * 1000);
 
@@ -162,7 +173,7 @@ function listBox(contestData){
     newListBox.innerHTML = `
         <a class="listLink" href="virtual_contest.html?ID=${contestData.virtualContestID}#contest"></a>
         <div class="listItem ${itemClass}">
-            <p class="title">${contestData.title}</p>
+            <p class="title" id="contestTitle${contestData.virtualContestID}"></p>
             <p class="space"></p>
             <p class="time">${formatTime(startTime)}</p>
             <p class="space"></p>
@@ -173,6 +184,33 @@ function listBox(contestData){
             <div class="diff">${diffBox}</div>
         </div>
     `;
+
+    const result = newListBox.querySelector(`#contestTitle${contestData.virtualContestID}`);
+    const regex = new RegExp(filterSearch.value, "ig");
+    const target = contestData.title;
+    if(filterSearch.value && target.match(regex)){
+        let resultString = target.replace(regex, match => `[[mark class=highlight]]${match}[[/mark]]`);
+        resultString = escapeHTML(resultString);
+
+        resultString = resultString.replaceAll('[[mark class=highlight]]', '<mark class="highlight">');
+        result.innerHTML = resultString.replaceAll('[[/mark]]', '</mark>');
+
+        // // const markRegex = new RegExp("\[\[mark class=highlight\]\]([^[]+?)\[\[/mark\]\]", "g")
+        // // result.innerHTML = resultString.replace(markRegex, match => `<mark class="highlight">${match}</mark>`)
+
+
+        // const text = escapeHTML(target);
+        // result.innerHTML = text.replace(regex, match => `<mark class="highlight">${match}</mark>`);
+
+        
+        // let resultString = target;
+        // result.innerHTML = resultString.replace(regex, match => {
+        //     resultString = escapeHTML(resultString);
+        //     return `<mark class="highlight">${match}</mark>`
+        // });
+    }else{
+        result.textContent = target;
+    }
 
     return newListBox;
 }
@@ -375,7 +413,7 @@ function convertData(data, method = 'filter', keyword = ''){
     let newData = data;
     // newData = newData.filter(item => item.visible == "All");
     // newData = newData.filter(item => item.title.includes(filterSearch.value));
-    const regex = new RegExp(filterSearch.value, "i");
+    const regex = new RegExp(filterSearch.value, "ig");
     newData = newData.filter(item => JSON.stringify(item.title).match(regex));
 
     if(filterVisible.value != "none"){

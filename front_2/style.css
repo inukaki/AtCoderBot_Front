@@ -11,6 +11,7 @@
     --borderColor1: var(--gray);
     --borderColor01: #8f8f8f;
     --empBorderColor: var(--red);
+    --highlightColor: #ffff0099;
 
     --upcomingColor: #ffe8e8;
     --runningColor: #e8ffe8;
@@ -34,6 +35,11 @@
 }
 body{
     background-color: var(--backgroundColor);
+}
+.highlight{
+    background-color: var(--highlightColor);
+    border-radius: 0.2em;
+    border: 1px solid var(--borderColor01);
 }
 
 header .selector{
