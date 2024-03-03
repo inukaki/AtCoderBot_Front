@@ -8,6 +8,9 @@ function saveData(data){
     if (code == 'main'){
         document.getElementById("sortStart").value = "0-9";
         displayContestsList('sort', 'start');
+        // setInterval(() => {
+        //     displayContestsList();
+        // }, 200);
     }else if (code == 'contest'){
         displayContest(acquiredData);
     }
@@ -69,7 +72,7 @@ function secondsToDDHHMMSS(seconds) {
 
 function displayRightBottomTime(unixTime){
     const clock = document.getElementById("clock");
-    clock.innerHTML = formatTime(unixTime);
+    clock.textContent = formatTime(unixTime);
 }
 displayRightBottomTime(currentUnixTime());
 
@@ -156,10 +159,12 @@ function listBox(contestData){
     const newListBox = document.createElement('div');
     newListBox.classList.add('listGroup');
     let itemClass;
+    let timerClass = "";
     if (currentTime < startTime) {
         itemClass = "upcomingContest";
-    } else if (currentTime < endTime){
+    } else if (currentTime <= endTime){
         itemClass = "runningContest";
+        timerClass = " timerRunning";
     } else {
         itemClass = "recentContest";
     }
@@ -177,6 +182,8 @@ function listBox(contestData){
             <p class="space"></p>
             <p class="time">${formatTime(startTime)}</p>
             <p class="space"></p>
+            <p class="timer${timerClass}" id="timer${contestData.virtualContestID}"></p>
+            <p class="space"></p>
             <p class="time">${formatTime(endTime)}</p>
             <p class="space"></p>
             <p class="memNum">${contestData.members.length}</p>
@@ -184,6 +191,14 @@ function listBox(contestData){
             <div class="diff">${diffBox}</div>
         </div>
     `;
+    
+    if(itemClass == "runningContest"){
+        const timer = newListBox.querySelector(`#timer${contestData.virtualContestID}`);
+        timer.style.setProperty('--percent', `${(endTime-currentUnixTime()) / contestData.durationSecond * 100}%`);
+        setInterval(() => {
+            timer.style.setProperty('--percent', `${(endTime-currentUnixTime()) / contestData.durationSecond * 100}%`);
+        }, 200);
+    }
 
     const result = newListBox.querySelector(`#contestTitle${contestData.virtualContestID}`);
     const regex = new RegExp(filterSearch.value, "ig");
@@ -191,7 +206,6 @@ function listBox(contestData){
     if(filterSearch.value && target.match(regex)){
         let resultString = target.replace(regex, match => `[[mark class=highlight]]${match}[[/mark]]`);
         resultString = escapeHTML(resultString);
-
         resultString = resultString.replaceAll('[[mark class=highlight]]', '<mark class="highlight">');
         result.innerHTML = resultString.replaceAll('[[/mark]]', '</mark>');
 
@@ -462,13 +476,13 @@ function convertData(data, method = 'filter', keyword = ''){
 }
 
 function displayContestsList(method = 'filter', keyword = '') {
-    listContainer1.innerHTML = "<h3>Upcoming Contests</h3>";
-    listContainer2.innerHTML = "<h3>Running Contests</h3>";
-    listContainer3.innerHTML = "<h3>Recent Contests</h3>";
-    const currentTime = currentUnixTime();
     const container1 = document.getElementById("listContainer1");
     const container2 = document.getElementById("listContainer2");
     const container3 = document.getElementById("listContainer3");
+    container1.innerHTML = "<h3>Upcoming Contests</h3>";
+    container2.innerHTML = "<h3>Running Contests</h3>";
+    container3.innerHTML = "<h3>Recent Contests</h3>";
+    const currentTime = currentUnixTime();
 
     convertData(acquiredData, method, keyword).forEach(item => {
         // console.log(item);
@@ -480,11 +494,20 @@ function displayContestsList(method = 'filter', keyword = '') {
 
         if (currentTime < startTime) {
             container1.appendChild(newListBox);
-        } else if (currentTime < endTime){
+        } else if (currentTime <= endTime){
             container2.appendChild(newListBox);
         } else {
             container3.appendChild(newListBox);
         }
+    });
+    resetHeight();
+}
+
+function resetHeight(){
+    const timers = document.querySelectorAll(".timerRunning");
+    timers.forEach(timer => {
+        const width = window.getComputedStyle(timer).width;
+        timer.style.height = width;
     });
 }
 
@@ -552,20 +575,20 @@ if (code == 'contest') {
         let limitContent;
         if (currentTime < startTime) {
             limitContent = `<p class="timeS">開始まで:</p><p>${secondsToDDHHMMSS(startTime-currentTime)}</p>`;
-        } else if (currentTime < endTime){
+        } else if (currentTime <= endTime){
             limitContent = `<p class="timeS">終了まで:</p><p>${secondsToDDHHMMSS(endTime-currentTime)}</p>`;
         } else {
             limitContent = `<p class="timeS">終了から:</p><p>${secondsToDDHHMMSS(currentTime-endTime)}</p>`;
         }
-        limitTime.innerHTML = `${limitContent}`;
+        document.getElementById("limitTime").innerHTML = `${limitContent}`;
     }
     
     function displayContest(data) {
         const startTime = data.startAt;
         const endTime = data.startAt + data.durationSecond;
         
-        contestTimes.innerHTML =`
-            <h2>${data.title}</h2>
+        document.getElementById("contestTimes").innerHTML =`
+            <h2 id="titleContent"></h2>
             <div>
                 <div class="time">
                     <p class="timeS">Start:</p><p>${formatTime(startTime)}</p>
@@ -576,16 +599,24 @@ if (code == 'contest') {
                 <div id="limitTime" class="time"></div>
             </div>
         `;
-        members.innerHTML = `${data.members.map((listItem, index) => `<li>${listItem}</li>`).join('')}`;
+        document.getElementById("titleContent").textContent = data.title;
 
         displayLimit(acquiredData);
         setInterval(() => {
             displayLimit(acquiredData);
         }, 200);
 
+        const membersContent = document.getElementById("membersContent");
+        membersContent.textContent = "";
+        data.members.forEach(member => {
+            const newLi = document.createElement("li");
+            newLi.textContent = member;
+            membersContent.appendChild(newLi);
+        });
+
         const problemsBody = document.getElementById("problemsBody");
         const resultHeadRow = document.getElementById("resultHeadRow");
-        problemsBody.innerHTML = "";
+        problemsBody.textContent = "";
         resultHeadRow.innerHTML = "<th></th><th>Name</th><th>Score</th>";
 
         const problems = data.problems;
@@ -642,8 +673,6 @@ if (code == 'contest') {
                 const newEachScore = document.createElement('td');
                 if (problem.accepted) {
                     newEachScore.textContent = problem.point;
-                } else {
-                    newEachScore.textContent = "";
                 }
                 newRow.appendChild(newEachScore);
             });
@@ -793,15 +822,26 @@ if (code == 'main') {
             .then(response => response.json())
             // .then(data => console.log('POST Response:', data))
             .then(data => createSuccess(data))
-            .catch(error => console.error('POST Error:', error));
+            .catch(error => {
+                createError();
+                console.error('POST Error:', error);
+            });
     }
 
     function createSuccess(data) {
         saveContestData(data);
         const notice = document.getElementById('createDisplay');
         const newP = document.createElement('p');
-        newP.innerHTML = 'Create Successfully!';
+        newP.textContent = 'Create Successfully!';
         notice.appendChild(newP);
         notice.appendChild(listBox(data));
     }
+
+    function createError(){
+        const notice = document.getElementById('createDisplay');
+        const newP = document.createElement('p');
+        newP.textContent = 'Create Failed';
+        notice.appendChild(newP);
+    }
+
 }

@@ -38,6 +38,8 @@
               <p class="space"></p>
               <p class="time">Start</p>
               <p class="space"></p>
+              <p class="timer">Timer</p>
+              <p class="space"></p>
               <p class="time">End</p>
               <p class="space"></p>
               <p class="memNum">Members</p>
@@ -70,6 +72,8 @@
                 </div>
               </div>
               <p class="space"></p>
+              <p class="timer"></p>
+              <p class="space"></p>
               <div class="time">
                 <div class="sort-filter">
                   <select class="sort-filter-input" id="sortEnd" onchange="displayContestsList('sort', 'end')">
@@ -93,6 +97,8 @@
               </div>
               <p class="space"></p>
               <p class="time">←正規表現使えます</p>
+              <p class="space"></p>
+              <p class="timer"></p>
               <p class="space"></p>
               <div class="time">
                 <div class="sort-filter">
@@ -135,7 +141,7 @@
         <div id="contestHead">
           <!--  -->
           <div class="view" id="contestTimes">
-            <h2>title</h2>
+            <h2 id="titleContent">title</h2>
             <div>
               <div class="time">
                 <p class="timeS">Start:</p><p>startTime</p>
@@ -172,7 +178,7 @@
         <div id="contestMember">
           <!--  -->
           <div class="view">
-            <ul id="members">members</ul>
+            <ul id="membersContent">members</ul>
           </div>
           <!--  -->
           <div class="edit">

@@ -12,6 +12,7 @@
     --borderColor01: #8f8f8f;
     --empBorderColor: var(--red);
     --highlightColor: #ffff0099;
+    --pieColor: var(--red);
 
     --upcomingColor: #ffe8e8;
     --runningColor: #e8ffe8;
@@ -205,6 +206,7 @@ input:checked + .slider:before {
 /* スライドボタンここまで */
 
 main .listGroup{
+    /* margin: 0.4em auto; */
     position: relative;
 }
 main .listGroup a{
@@ -235,6 +237,16 @@ main .listGroup .time{
     font-size: 0.7em;
     width: 15%;
 }
+main .listGroup .timer{
+    margin: auto;
+    font-size: 0.7em;
+    width: 5%;
+}
+main .listGroup .timerRunning{
+    border-radius: 50%;
+    background: conic-gradient(var(--pieColor) 0% var(--percent, 60%), transparent var(--percent, 60%) 100%);
+    border: 1px solid var(--borderColor0);
+}
 main .listGroup .memNum{
     margin: auto;
     font-size: 0.7em;
@@ -252,7 +264,7 @@ main .listGroup .diff{
     border: 1px solid var(--borderColor0);
 }
 main .listGroup .space{
-    width: 2%;
+    width: 1%;
 }
 main .listGroup .sort-filter{
     font-size: 16px;
@@ -293,7 +305,7 @@ main #contestHead .time .timeS{
 /* #contestMember{
     height: 10em;
 } */
-main #members li{
+main #membersContent li{
     list-style-type: decimal;
 }
 /* #contestProblems{
