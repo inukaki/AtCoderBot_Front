@@ -42,9 +42,12 @@ body{
     border-radius: 0.2em;
     border: 1px solid var(--borderColor01);
 }
+.stringSpace{
+    width: 2em;
+}
 
 header .selector{
-    margin: 3em 0 1em;
+    margin: 2em 0 1em;
     border-bottom: 1px solid var(--borderColor0);
 }
 header .selector ul{
@@ -57,9 +60,15 @@ header .selector li{
     list-style-type: none;
 }
 header .selector .nav-item{
+    margin: 0 1px -1px;
     width: 10em;
     height: 2em;
     border-radius: 0.2em 0.2em 0 0;
+    border-top: 1px solid var(--borderColor1);
+    border-right: 1px solid var(--borderColor01);
+    border-left: 1px solid var(--borderColor1);
+    /* border: 1px solid var(--borderColor1);
+    border-bottom: 1px solid #ffffff00; */
     position: relative;
 }
 header .selector p{
@@ -77,22 +86,21 @@ header .selector a{
     width: 100%;
     height: 100%;
 }
-header .selector .nav-item {
-    border: 1px solid var(--borderColor1);
-    border-bottom: 1px solid var(--backgroundColor);
-}
 header .selector .active-box {
     border: 1px solid var(--borderColor0);
     border-bottom: 1px solid var(--backgroundColor);
 }
 header .selector .nav-item:hover{
-    border: 1px solid var(--empBorderColor);
-    border-bottom: 1px solid var(--backgroundColor);
+    border-top: 1px solid var(--empBorderColor);
+    border-right: 1px solid var(--empBorderColor);
+    border-left: 1px solid var(--empBorderColor);
+    /* border: 1px solid var(--empBorderColor);
+    border-bottom: 1px solid var(--backgroundColor); */
 }
 
 
 main{
-    width: 98%;
+    width: 96%;
     margin: auto;
 }
 main #right-bottom{
@@ -332,15 +340,19 @@ main .proLink{
     background-color: #ffffffbb;
 }
 
+main .ranking{
+    display: flex;
+}
+main .ranking #reloadTime{
+    margin: auto 0;
+}
+
 
 .createProBoxGroup{
     display: flex;
 }
 .editProBoxGroup{
     display: flex;
-}
-.diffSpace{
-    width: 2em;
 }
 .createProSelect{
     display: block;

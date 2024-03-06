@@ -13,11 +13,11 @@
       <!-- ページ内リンク等のナビゲーション -->
       <nav class="selector">
         <ul class="nav nav-tabs">
-          <li class="nav-item active-box">
+          <li id="tab1" class="nav-item active-box">
             <p>Contests</p>
             <a class="nav-link active" href="virtual_contest.html#list"></a>
           </li>
-          <li class="nav-item">
+          <li id="tab2" class="nav-item">
             <p>Create</p>
             <a class="nav-link" href="virtual_contest.html#create"></a>
           </li>
@@ -124,7 +124,7 @@
       <hr>
       <!-- contest -->
       <section id="contest">
-        <button onclick="getContest()">LOAD</button>
+        <!-- <button onclick="getContest()">LOAD</button> -->
         <div class="switch-container">
           <label class="switch-label" for="toggleEdit">
             View
@@ -220,7 +220,7 @@
                     ID
                   </label>
                 </div>
-                <div class="diffSpace"></div>
+                <div class="stringSpace"></div>
                 <select class="editProSelect" id="editProSelect0">
                   <option value="Gray">Gray</option>
                   <option value="Brown">Brown</option>
@@ -242,7 +242,11 @@
         </div>
 
         <div class="view">
-          <h3>Ranking</h3>
+          <div class="ranking">
+            <h3>Ranking</h3>
+            <p class="stringSpace"></p>
+            <p id="reloadTime">データ</p>
+          </div>
           <table class="table">
             <thead>
               <tr id="resultHeadRow">
@@ -302,7 +306,7 @@
                 ID
               </label>
             </div>
-            <div class="diffSpace"></div>
+            <div class="stringSpace"></div>
             <select class="createProSelect" id="createProSelect0">
               <option value="Gray">Gray</option>
               <option value="Brown">Brown</option>

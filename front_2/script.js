@@ -94,24 +94,33 @@ window.addEventListener('hashchange', function() {
     var contest = document.getElementById('contest');
     var create = document.getElementById('create');
 
+    const tab1 = document.getElementById("tab1");
+    const tab2 = document.getElementById("tab2");
+
     // コンテンツの表示/非表示を切り替え
     if (hash === 'list') {
         code = 'main';
         list.style.display = 'block';
         contest.style.display = 'none';
         create.style.display = 'none';
+        tab1.classList.add("active-box");
+        tab2.classList.remove("active-box");
         console.log("#list");
     } else if (hash === 'contest') {
         code = 'contest';
         list.style.display = 'none';
         contest.style.display = 'block';
         create.style.display = 'none';
+        tab1.classList.add("active-box");
+        tab2.classList.remove("active-box");
         console.log("#contest");
     } else if (hash === 'create') {
         code = 'main';
         list.style.display = 'none';
         contest.style.display = 'none';
         create.style.display = 'block';
+        tab1.classList.remove("active-box");
+        tab2.classList.add("active-box");
         console.log("#create");
     } else {
         // ハッシュが未定義の場合や対応するものがない場合のデフォルト設定
@@ -119,6 +128,8 @@ window.addEventListener('hashchange', function() {
         list.style.display = 'block';
         contest.style.display = 'none';
         create.style.display = 'none';
+        tab1.classList.add("active-box");
+        tab2.classList.remove("active-box");
         console.log("#none");
     }
 });
@@ -292,7 +303,7 @@ function addDiv(type = "createName"){
                     ID
                 </label>
             </div>
-            <div class="diffSpace"></div>
+            <div class="stringSpace"></div>
             <select class="${type}Select" id="${type}Select${divIndex}">
                 <option value="Gray">Gray</option>
                 <option value="Brown">Brown</option>
@@ -628,10 +639,11 @@ if (code == 'contest') {
                     <a href="${url}" rel="noopener" target="_blank" class="proLink">${index + 1}</a>
                 </th>
                 <td>
-                    <a href="${url}" rel="noopener" target="_blank">${problem.name}</a>
+                    <a href="${url}" rel="noopener" target="_blank" id="problemName${index + 1}"></a>
                 </td>
                 <td>${problem.point}</td>
             `;
+            newRow.querySelector(`#problemName${index + 1}`).textContent = problem.name;
             
             problemsBody.appendChild(newRow);
 
@@ -643,7 +655,7 @@ if (code == 'contest') {
     }
 
     function getResult(){
-        console.log(`${apiUrl}/virtual_contests/standings/${virtualContestID}`);
+        // console.log(`${apiUrl}/virtual_contests/standings/${virtualContestID}`);
         fetch(`${apiUrl}/virtual_contests/standings/${virtualContestID}`, {
             // mode: 'no-cors',
             method: 'GET',
@@ -656,19 +668,22 @@ if (code == 'contest') {
             .catch(error => console.error('GET Error:', error.message));
     }
     function displayResult(data) {
-        const resultBody = document.getElementById("resultBody");
-        data.sort((a, b) => b.point - a.point);
+        console.log(`Result at ${formatTime(currentUnixTime())}`, data);
 
+        const resultBody = document.getElementById("resultBody");
+        resultBody.innerHTML = "";
+
+        data.sort((a, b) => b.point - a.point);
         data.forEach((member, index) => {
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
                 <th>${index + 1}</th>
-                <td>${member.atcoderID}</td>
+                <td id="atcoderID${index + 1}"></td>
                 <td>${member.point}</td>
             `;
+            newRow.querySelector(`#atcoderID${index + 1}`).textContent = member.atcoderID;
             
             const problems = member.problems;
-            
             problems.forEach(problem => {
                 const newEachScore = document.createElement('td');
                 if (problem.accepted) {
@@ -678,9 +693,15 @@ if (code == 'contest') {
             });
             resultBody.appendChild(newRow);
         });
+
+        document.getElementById("reloadTime").textContent = `${formatTime(currentUnixTime())} 最終更新`;
     }
+    
     getContest();
     getResult();
+    setInterval(() => {
+        getResult();
+    }, 10000);
 
     function switchEdit(){
         const toggleEdit = document.getElementById("toggleEdit").checked;
