@@ -856,6 +856,7 @@ if (code == 'main') {
         newP.textContent = 'Create Successfully!';
         notice.appendChild(newP);
         notice.appendChild(listBox(data));
+        resetHeight();
     }
 
     function createError(){
