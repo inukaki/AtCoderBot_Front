@@ -630,9 +630,11 @@ if (code == 'contest') {
         document.getElementById("limitTime").innerHTML = `${limitContent}`;
     }
     
+    let contestStartTime;
     // コンテストの情報を表示
     function displayContest(data) {
         const startTime = data.startAt;
+        contestStartTime = startTime;
         const endTime = data.startAt + data.durationSecond;
         
         document.getElementById("contestTimes").innerHTML =`
@@ -665,26 +667,27 @@ if (code == 'contest') {
         const problemsBody = document.getElementById("problemsBody");
         const resultHeadRow = document.getElementById("resultHeadRow");
         problemsBody.textContent = "";
-        resultHeadRow.innerHTML = "<th></th><th>Name</th><th>Score</th>";
+        resultHeadRow.innerHTML = '<th class="index"></th><th class="name">Name</th><th class="totalScore">Score</th>';
         const problems = data.problems;
         problems.forEach((problem, index) => {
             const url = `https://atcoder.jp/contests/${problem.contestID}/tasks/${problem.problemID}`;
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
-                <th class="diff${diffToColor(problem.difficulty)}">
+                <th class="index diff${diffToColor(problem.difficulty)}">
                     <a href="${url}" rel="noopener" target="_blank" class="proLink">${index + 1}</a>
                 </th>
                 <td>
-                    <a href="${url}" rel="noopener" target="_blank" id="problemName${index + 1}"></a>
+                    <a href="${url}" rel="noopener" target="_blank" id="problemName${index + 1}" class="title"></a>
                 </td>
-                <td>${problem.point}</td>
+                <td class="point">${problem.point}</td>
             `;
             newRow.querySelector(`#problemName${index + 1}`).textContent = problem.name;
             
             problemsBody.appendChild(newRow);
 
             const newHead = document.createElement('th');
-            newHead.textContent = index + 1;
+            newHead.classList.add("scores");
+            newHead.innerHTML = `<a href="${url}" rel="noopener" target="_blank">${index + 1}</a>`;
             resultHeadRow.appendChild(newHead);
         });
 
@@ -713,21 +716,43 @@ if (code == 'contest') {
         data.sort((a, b) => b.point - a.point);
         data.forEach((member, index) => {
             const newRow = document.createElement('tr');
+            let timeString = "";
+            if(member.time != 0){
+                timeString = secondsToDDHHMMSS(member.time-contestStartTime);
+            }
             newRow.innerHTML = `
                 <th>${index + 1}</th>
                 <td id="atcoderID${index + 1}"></td>
-                <td>${member.point}</td>
+                <td>
+                    <div class="score" id="totalScore${index + 1}">${member.point}</div>
+                    <div class="time">${timeString}</div>
+                </td>
             `;
             newRow.querySelector(`#atcoderID${index + 1}`).textContent = member.atcoderID;
             
             const problems = member.problems;
+            let penalties = 0;
             problems.forEach(problem => {
+                const penalty = problem.penalty;
+                penalties += penalty;
+                let penaltyString = "";
+                if(penalty > 0){
+                    penaltyString = `<span class="penalty">(${penalty})</span>`;
+                }
                 const newEachScore = document.createElement('td');
                 if (problem.accepted) {
-                    newEachScore.textContent = problem.point;
+                    newEachScore.innerHTML = `
+                        <div class="score">${problem.point}${penaltyString}</div>
+                        <div class="time">${secondsToDDHHMMSS(problem.time-contestStartTime)}</div>
+                    `;
                 }
                 newRow.appendChild(newEachScore);
             });
+
+            if(penalties > 0){
+                newRow.querySelector(`#totalScore${index + 1}`).innerHTML += `<span class="penalty">(${penalties})</span>`;
+            }
+
             resultBody.appendChild(newRow);
         });
         // 更新時刻を表示

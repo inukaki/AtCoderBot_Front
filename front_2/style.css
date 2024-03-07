@@ -11,8 +11,12 @@
     --borderColor1: var(--gray);
     --borderColor01: #8f8f8f;
     --hoverBorderColor: var(--red);
+
     --highlightColor: #ffff0099;
     --pieColor: var(--red);
+    --scoreColor: #00af00;
+    --solveTimeColor: #7f7f7f;
+    --penaltyColor: var(--red);
 
     --upcomingColor: #ffe8e8;
     --runningColor: #e8ffe8;
@@ -309,13 +313,12 @@ main #membersContent li{
 }
 main .table{
     width: 100%;
-    margin-bottom: 1rem;
+    /* margin-bottom: 1rem; */
     color: var(--black);
     border-collapse: collapse;
-    text-indent: initial;
-    border-spacing: 2px;
+    /* text-indent: initial;
+    border-spacing: 2px; */
     line-height: 1.5;
-    border-radius: 10em;
     border: 2px solid var(--borderColor01);
 }
 main .table th{
@@ -323,6 +326,35 @@ main .table th{
 }
 main .table td{
     border: 2px solid var(--borderColor01);
+}
+main .table .index{
+    width: 5%;
+}
+main .table .title{
+    width: 70%;
+}
+main .table .point{
+    width: 25%;
+}
+main .table .name{
+    width: 10%;
+}
+main .table .totalScore{
+    width: 5%;
+}
+main .table .scores{
+    width: auto;
+}
+main .table .score{
+    text-align: center;
+    color: var(--scoreColor);
+}
+main .table .time{
+    text-align: center;
+    color: var(--solveTimeColor);
+}
+main .table .penalty{
+    color: var(--penaltyColor);
 }
 main .proLink{
     background-color: #ffffffbb;
