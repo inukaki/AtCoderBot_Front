@@ -668,12 +668,13 @@ if (code == 'contest') {
         const resultHeadRow = document.getElementById("resultHeadRow");
         problemsBody.textContent = "";
         resultHeadRow.innerHTML = '<th class="index"></th><th class="name">Name</th><th class="totalScore">Score</th>';
+
         const problems = data.problems;
         problems.forEach((problem, index) => {
             const url = `https://atcoder.jp/contests/${problem.contestID}/tasks/${problem.problemID}`;
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
-                <th class="index diff${diffToColor(problem.difficulty)}">
+                <th class="index diffBox diff${diffToColor(problem.difficulty)}">
                     <a href="${url}" rel="noopener" target="_blank" class="proLink">${index + 1}</a>
                 </th>
                 <td>
@@ -687,8 +688,16 @@ if (code == 'contest') {
 
             const newHead = document.createElement('th');
             newHead.classList.add("scores");
-            newHead.innerHTML = `<a href="${url}" rel="noopener" target="_blank">${index + 1}</a>`;
+            newHead.classList.add("diffBox");
+            newHead.classList.add(`diff${diffToColor(problem.difficulty)}`);
+            newHead.innerHTML = `<a href="${url}" rel="noopener" target="_blank" class="proLink">${index + 1}</a>`;
             resultHeadRow.appendChild(newHead);
+        });
+        const diffBoxes = document.querySelectorAll(".diffBox");
+        diffBoxes.forEach(diffBox => {
+            const currentColor = window.getComputedStyle(diffBox).backgroundColor;
+            const newColor = currentColor.replace("rgb", "rgba").replace(")", ", " + 0.6 + ")");
+            diffBox.style.backgroundColor = newColor;
         });
 
         autoInput(data, "edit");

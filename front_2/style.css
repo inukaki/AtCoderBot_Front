@@ -9,7 +9,7 @@
     --backgroundColor: var(--white);
     --borderColor0: var(--black);
     --borderColor1: var(--gray);
-    --borderColor01: #8f8f8f;
+    --borderColor01: #4f4f4f;
     --hoverBorderColor: var(--red);
 
     --highlightColor: #ffff0099;
@@ -30,10 +30,14 @@
     --diffYellow: #c0c03d;
     --diffOrange: #ef8733;
     --diffRed: #ea3323;
+    --diffBackgroundColor: #ffffffbb;
     
     --button-width: 48px;
     --button-height: 24px;
     --button-margin: calc(var(--button-height) / 10 + 1px);
+    --buttonBackgroundColor: #cccccc;
+    --buttonColor: var(--white);
+    --buttonBackgroundColorChecked: #2196F3;
 
     --displayView: block;
     --displayEdit: none;
@@ -44,7 +48,7 @@ body{
 .highlight{
     background-color: var(--highlightColor);
     border-radius: 0.2em;
-    border: 1px solid var(--borderColor01);
+    border: 1px solid var(--borderColor1);
 }
 .stringSpace{
     width: 2em;
@@ -70,7 +74,7 @@ header .selector .nav-item{
     height: 2em;
     border-radius: 0.2em 0.2em 0 0;
     border-top: 1px solid var(--borderColor1);
-    border-right: 1px solid var(--borderColor01);
+    border-right: 1px solid var(--borderColor1);
     border-left: 1px solid var(--borderColor1);
     /* border: 1px solid var(--borderColor1);
     border-bottom: 1px solid #ffffff00; */
@@ -174,7 +178,7 @@ main #right-bottom #clock{
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: #ccc;
+    background-color: var(--buttonBackgroundColor);
     -webkit-transition: .2s;
     transition: .2s;
     border-radius: calc(var(--button-height) / 2);
@@ -187,7 +191,7 @@ main #right-bottom #clock{
     width: calc(var(--button-height) - var(--button-margin) * 2);
     left: calc(var(--button-margin) - 2px);
     bottom: calc(var(--button-margin) - 2px);
-    background-color: white;
+    background-color: var(--buttonColor);
     -webkit-transition: .2s;
     transition: .2s;
     border-radius: 50%;
@@ -196,7 +200,7 @@ input:focus + .slider {
     border: 2px solid var(--borderColor0);
 }
 input:checked + .slider {
-    background-color: #2196F3;
+    background-color: var(--buttonBackgroundColorChecked);
 }
 input:checked + .slider:before {
     -webkit-transform: translateX(calc(var(--button-width) - var(--button-height)));
@@ -357,7 +361,7 @@ main .table .penalty{
     color: var(--penaltyColor);
 }
 main .proLink{
-    background-color: #ffffffbb;
+    background-color: var(--diffBackgroundColor);
 }
 
 main .ranking{
