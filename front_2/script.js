@@ -598,7 +598,7 @@ if (code == 'contest') {
     const virtualContestID = getQueryParameter('ID');
     console.log(virtualContestID);
     document.getElementById("problems").innerHTML = `Problems<a href="virtual_contest.html?ID=${virtualContestID}#problems"></a>`;
-    document.getElementById("ranking").innerHTML = `Problems<a href="virtual_contest.html?ID=${virtualContestID}#ranking"></a>`;
+    document.getElementById("ranking").innerHTML = `Ranking<a href="virtual_contest.html?ID=${virtualContestID}#ranking"></a>`;
 
     // コンテストの情報を取得
     function getContest(){
@@ -640,9 +640,7 @@ if (code == 'contest') {
         const endTime = data.startAt + data.durationSecond;
         
         document.getElementById("contestTimes").innerHTML =`
-            <h2 id="titleContent">
-                <a href="virtual_contest.html?ID=${data.virtualContestID}#contest"></a>
-            </h2>
+            <h2 id="titleContent"></h2>
             <div>
                 <div class="time">
                     <p class="timeS">Start:</p><p>${formatTime(startTime)}</p>
