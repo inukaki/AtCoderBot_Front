@@ -10,7 +10,7 @@
   <body>
     <header>
       <h1>Virtual Contest</h1>
-      <!-- ページ内リンク等のナビゲーション -->
+      <!-- ナビゲーション -->
       <nav class="selector">
         <ul class="nav nav-tabs">
           <li id="tab1" class="nav-item active-box">
@@ -25,6 +25,7 @@
       </nav>
     </header>
     <main>
+      <!-- 時刻表示 -->
       <section id="right-bottom">
         <div id="clock"></div>
       </section>
@@ -44,10 +45,16 @@
               <p class="space"></p>
               <p class="memNum">Members</p>
               <p class="space"></p>
-              <div class="diff">Difficulty</div>
+              <div class="diff">
+                <p class="diff"></p>
+                <p>Difficulty</p>
+                <p class="diff"></p>
+                <p class="diff"></p>
+              </div>
             </div>
           </div>
         </div>
+        <!-- 並び替え,絞り込み -->
         <div id="listContainer000" class="conatiner">
           <div class="listGroup">
             <div class="listItem">
@@ -121,7 +128,6 @@
         <div id="listContainer1" class="conatiner"><h3>Upcoming Contests</h3></div>
         <div id="listContainer3" class="conatiner"><h3>Recent Contests</h3></div>
       </section>
-      <hr>
       <!-- contest -->
       <section id="contest">
         <!-- <button onclick="getContest()">LOAD</button> -->
@@ -135,11 +141,13 @@
             Edit
           </label>
         </div>
+        <!-- 編集ボタン -->
         <div class="edit">
           <button onclick="editContest()">Go</button>
         </div>
+        <!-- コンテストタイトル,時間 -->
         <div id="contestHead">
-          <!--  -->
+          <!-- 表示 -->
           <div class="view" id="contestTimes">
             <h2 id="titleContent">title</h2>
             <div>
@@ -152,7 +160,7 @@
               <div id="limitTime" class="time">limit</div>
             </div>
           </div>
-          <!--  -->
+          <!-- 編集 -->
           <div class="edit">
             <label for="editTitle">Title:</label>
             <input type="text" id="editTitle" placeholder="Title" value="New Contest">
@@ -175,12 +183,13 @@
 
         </div>
         <h4>Member</h4>
+        <!-- メンバー -->
         <div id="contestMember">
-          <!--  -->
+          <!-- 表示 -->
           <div class="view">
             <ul id="membersContent">members</ul>
           </div>
-          <!--  -->
+          <!-- 編集 -->
           <div class="edit">
             <div id="editNameBoxContainer">
               <div class="editNameBoxGroup">
@@ -192,8 +201,9 @@
 
         </div>
         <h3>Problems</h3>
+        <!-- 問題 -->
         <div id="contestProblems">
-          <!--  -->
+          <!-- 表示 -->
           <div class="view">
             <table class="table">
               <thead>
@@ -206,7 +216,7 @@
               <tbody id="problemsBody"></tbody>
             </table>
           </div>
-          <!--  -->
+          <!-- 編集 -->
           <div class="edit">
             <div id="editProBoxContainer">
               <div class="editProBoxGroup">
@@ -240,7 +250,7 @@
           </div>
 
         </div>
-
+        <!-- 結果表示 -->
         <div class="view">
           <div class="ranking">
             <h3>Ranking</h3>
@@ -260,7 +270,6 @@
         </div>
 
       </section>
-      <hr>
       <!-- create -->
       <section id="create">
         <label for="createTitle">Title:</label>
@@ -288,10 +297,6 @@
           </div>
         </div>
         <button onclick="addDiv('createName')">+</button>
-        <!-- <div>
-          <button onclick="saveNameList()">SAVE</button>
-          <button onclick="loadNameList()">LOAD</button>
-        </div> -->
         <hr>
         Problems
         <div id="createProBoxContainer">
@@ -324,6 +329,7 @@
           <button onclick="addDiv('createPro')">+</button>
         </div>
         <hr>
+        <!-- 作成ボタン -->
         <div>
           <button onclick="createContest()">Create</button>
         </div>
