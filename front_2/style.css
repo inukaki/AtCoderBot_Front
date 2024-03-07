@@ -53,104 +53,6 @@ body{
 .stringSpace{
     width: 2em;
 }
-
-/* ヘッダー */
-header .selector{
-    margin: 2em 0 1em;
-    border-bottom: 1px solid var(--borderColor0);
-}
-header .selector ul{
-    margin: 0 auto 0 0;
-    display: flex;
-    justify-content: flex-start;
-}
-header .selector li{
-    margin: 0;
-    list-style-type: none;
-}
-header .selector .nav-item{
-    margin: 0 1px -1px;
-    width: 10em;
-    height: 2em;
-    border-radius: 0.2em 0.2em 0 0;
-    border-top: 1px solid var(--borderColor1);
-    border-right: 1px solid var(--borderColor1);
-    border-left: 1px solid var(--borderColor1);
-    /* border: 1px solid var(--borderColor1);
-    border-bottom: 1px solid #ffffff00; */
-    position: relative;
-}
-header .selector p{
-    margin-top: 0.5em;
-    text-align: center;
-}
-header .selector a{
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-header .selector .active-box {
-    border: 1px solid var(--borderColor0);
-    border-bottom: 1px solid var(--backgroundColor);
-}
-header .selector .nav-item:hover{
-    border-top: 1px solid var(--hoverBorderColor);
-    border-right: 1px solid var(--hoverBorderColor);
-    border-left: 1px solid var(--hoverBorderColor);
-    /* border: 1px solid var(--hoverBorderColor);
-    border-bottom: 1px solid var(--backgroundColor); */
-}
-
-
-/* 本体 */
-main{
-    width: 96%;
-    margin: auto;
-}
-main #right-bottom{
-    z-index: 100;
-    position: fixed;
-    right: 0;
-    bottom: 0;
-    margin: 2em;
-    border-radius: 1em;
-    border: 1px solid var(--borderColor0);
-    background-color: var(--white);
-    padding: 1em;
-}
-main #right-bottom #clock{
-    margin: auto;
-    font-size: 0.8em;
-}
-
-.diffGray{
-    background-color: var(--diffGray);
-}
-.diffBrown{
-    background-color: var(--diffBrown);
-}
-.diffGreen{
-    background-color: var(--diffGreen);
-}
-.diffCyan{
-    background-color: var(--diffCyan);
-}
-.diffBlue{
-    background-color: var(--diffBlue);
-}
-.diffYellow{
-    background-color: var(--diffYellow);
-}
-.diffOrange{
-    background-color: var(--diffOrange);
-}
-.diffRed{
-    background-color: var(--diffRed);
-}
-
-
 /* スライドボタンここから */
 .switch-container {
     display: flex;
@@ -209,6 +111,122 @@ input:checked + .slider:before {
 }
 /* スライドボタンここまで */
 
+
+/* ヘッダー */
+header h1{
+    position: relative;
+}
+header h1 a{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+header .selector{
+    margin: 2em 0 1em;
+    border-bottom: 1px solid var(--borderColor0);
+}
+header .selector ul{
+    margin: 0 auto 0 0;
+    display: flex;
+    justify-content: flex-start;
+}
+header .selector li{
+    margin: 0;
+    list-style-type: none;
+}
+header .selector .nav-item{
+    margin: 0 1px -1px;
+    width: 10em;
+    height: 2em;
+    border-radius: 0.2em 0.2em 0 0;
+    border-top: 1px solid var(--borderColor1);
+    border-right: 1px solid var(--borderColor1);
+    border-left: 1px solid var(--borderColor1);
+    /* border: 1px solid var(--borderColor1);
+    border-bottom: 1px solid #ffffff00; */
+    position: relative;
+}
+header .selector p{
+    margin-top: 0.5em;
+    text-align: center;
+}
+header .selector a{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+header .selector .active-box {
+    border: 1px solid var(--borderColor0);
+    border-bottom: 1px solid var(--backgroundColor);
+}
+header .selector .nav-item:hover{
+    border-top: 1px solid var(--hoverBorderColor);
+    border-right: 1px solid var(--hoverBorderColor);
+    border-left: 1px solid var(--hoverBorderColor);
+    /* border: 1px solid var(--hoverBorderColor);
+    border-bottom: 1px solid var(--backgroundColor); */
+}
+
+/* 本体 */
+main{
+    width: 96%;
+    margin: auto;
+}
+main #right-bottom{
+    z-index: 100;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    margin: 2em;
+    border-radius: 1em;
+    border: 1px solid var(--borderColor0);
+    background-color: var(--white);
+    padding: 1em;
+}
+main #right-bottom #clock{
+    margin: auto;
+    font-size: 0.8em;
+}
+
+.diffGray{
+    background-color: var(--diffGray);
+}
+.diffBrown{
+    background-color: var(--diffBrown);
+}
+.diffGreen{
+    background-color: var(--diffGreen);
+}
+.diffCyan{
+    background-color: var(--diffCyan);
+}
+.diffBlue{
+    background-color: var(--diffBlue);
+}
+.diffYellow{
+    background-color: var(--diffYellow);
+}
+.diffOrange{
+    background-color: var(--diffOrange);
+}
+.diffRed{
+    background-color: var(--diffRed);
+}
+
+main .container h3{
+    position: relative;
+}
+main .container a{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
 /* コンテストボックス */
 main .listGroup{
     /* margin: 0.4em auto; */
@@ -306,6 +324,16 @@ main .listGroup .recentContest{
     display: var(--displayEdit);
 }
 
+main #titleContent{
+    position: relative;
+}
+main #titleContent a{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
 main #contestHead .time{
     display: flex;
 }
@@ -314,6 +342,32 @@ main #contestHead .time .timeS{
 }
 main #membersContent li{
     list-style-type: decimal;
+}
+main #problems{
+    position: relative;
+}
+main #problems a{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+main .ranking{
+    display: flex;
+}
+main #ranking{
+    position: relative;
+}
+main #ranking a{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+main .ranking #reloadTime{
+    margin: auto 0;
 }
 main .table{
     width: 100%;
@@ -364,12 +418,6 @@ main .proLink{
     background-color: var(--diffBackgroundColor);
 }
 
-main .ranking{
-    display: flex;
-}
-main .ranking #reloadTime{
-    margin: auto 0;
-}
 
 
 /* 作成,編集 */

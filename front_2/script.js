@@ -127,7 +127,7 @@ window.addEventListener('hashchange', function() {
     const tab1 = document.getElementById("tab1");
     const tab2 = document.getElementById("tab2");
     // コンテンツの表示/非表示を切り替え
-    if (hash === 'list') {
+    if (hash === 'list' || hash === 'running' || hash === 'upcoming' || hash === 'recent') {
         code = 'main';
         list.style.display = 'block';
         contest.style.display = 'none';
@@ -136,7 +136,7 @@ window.addEventListener('hashchange', function() {
         tab2.classList.remove("active-box");
         resetHeight();
         console.log('#list');
-    } else if (hash === 'contest') {
+    } else if (hash === 'contest' || hash === 'problems' || hash === 'ranking') {
         code = 'contest';
         list.style.display = 'none';
         contest.style.display = 'block';
@@ -520,12 +520,12 @@ function convertData(data, method = 'filter', keyword = ''){
 // コンテストのリストを表示
 // 引数: 同上
 function displayContestsList(method = 'filter', keyword = '') {
-    const container1 = document.getElementById("listContainer1");
-    const container2 = document.getElementById("listContainer2");
-    const container3 = document.getElementById("listContainer3");
-    container1.innerHTML = "<h3>Upcoming Contests</h3>";
-    container2.innerHTML = "<h3>Running Contests</h3>";
-    container3.innerHTML = "<h3>Recent Contests</h3>";
+    const upcoming = document.getElementById("upcoming");
+    const running = document.getElementById("running");
+    const recent = document.getElementById("recent");
+    upcoming.innerHTML = '<h3>Upcoming Contests<a href="virtual_contest.html#upcoming"></a></h3>';
+    running.innerHTML = '<h3>Running Contests<a href="virtual_contest.html#running"></a></h3>';
+    recent.innerHTML = '<h3>Recent Contests<a href="virtual_contest.html#recent"></a></h3>';
     const currentTime = currentUnixTime();
 
     convertData(acquiredData, method, keyword).forEach(item => {
@@ -536,11 +536,11 @@ function displayContestsList(method = 'filter', keyword = '') {
         const newListBox = listBox(item);
 
         if (currentTime < startTime) {
-            container1.appendChild(newListBox);
+            upcoming.appendChild(newListBox);
         } else if (currentTime <= endTime){
-            container2.appendChild(newListBox);
+            running.appendChild(newListBox);
         } else {
-            container3.appendChild(newListBox);
+            recent.appendChild(newListBox);
         }
     });
     resetHeight();
@@ -597,6 +597,8 @@ if (code == 'contest') {
     }
     const virtualContestID = getQueryParameter('ID');
     console.log(virtualContestID);
+    document.getElementById("problems").innerHTML = `Problems<a href="virtual_contest.html?ID=${virtualContestID}#problems"></a>`;
+    document.getElementById("ranking").innerHTML = `Problems<a href="virtual_contest.html?ID=${virtualContestID}#ranking"></a>`;
 
     // コンテストの情報を取得
     function getContest(){
@@ -638,7 +640,9 @@ if (code == 'contest') {
         const endTime = data.startAt + data.durationSecond;
         
         document.getElementById("contestTimes").innerHTML =`
-            <h2 id="titleContent"></h2>
+            <h2 id="titleContent">
+                <a href="virtual_contest.html?ID=${data.virtualContestID}#contest"></a>
+            </h2>
             <div>
                 <div class="time">
                     <p class="timeS">Start:</p><p>${formatTime(startTime)}</p>
@@ -649,7 +653,12 @@ if (code == 'contest') {
                 <div id="limitTime" class="time"></div>
             </div>
         `;
-        document.getElementById("titleContent").textContent = data.title;
+        const titleContent =  document.getElementById("titleContent");
+        titleContent.textContent = data.title;
+        const newA = document.createElement('a');
+        newA.href = `virtual_contest.html?ID=${data.virtualContestID}#contest`;
+        titleContent.appendChild(newA);
+
         displayLimit(acquiredData);
         setInterval(() => {
             displayLimit(acquiredData);
@@ -693,6 +702,7 @@ if (code == 'contest') {
             newHead.innerHTML = `<a href="${url}" rel="noopener" target="_blank" class="proLink">${index + 1}</a>`;
             resultHeadRow.appendChild(newHead);
         });
+        // 背景色を透過
         const diffBoxes = document.querySelectorAll(".diffBox");
         diffBoxes.forEach(diffBox => {
             const currentColor = window.getComputedStyle(diffBox).backgroundColor;
@@ -726,7 +736,7 @@ if (code == 'contest') {
         data.forEach((member, index) => {
             const newRow = document.createElement('tr');
             let timeString = "";
-            if(member.time != 0){
+            if(member.time >= contestStartTime){
                 timeString = secondsToDDHHMMSS(member.time-contestStartTime);
             }
             newRow.innerHTML = `
