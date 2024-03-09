@@ -113,11 +113,12 @@ function saveData(data){
 }
 
 let code = 'main';
+let hash = '';
 // urlの#によって表示する要素を変更
 window.addEventListener('hashchange', function() {
     // # を取り除く
-    const hash = window.location.hash.substring(1);
-    // console.log(hash);
+    hash = window.location.hash.substring(1);
+    console.log(`#${hash}`);
     // #?の順の時だと#以降は全て#になってしまうので、以下が必要
     // hash = hash.split('?')[0];
     // console.log(hash);
@@ -135,7 +136,6 @@ window.addEventListener('hashchange', function() {
         tab1.classList.add("active-box");
         tab2.classList.remove("active-box");
         resetHeight();
-        console.log('#list');
     } else if (hash === 'contest' || hash === 'problems' || hash === 'ranking') {
         code = 'contest';
         list.style.display = 'none';
@@ -143,7 +143,6 @@ window.addEventListener('hashchange', function() {
         create.style.display = 'none';
         tab1.classList.add("active-box");
         tab2.classList.remove("active-box");
-        console.log('#contest');
     } else if (hash === 'create') {
         code = 'main';
         list.style.display = 'none';
@@ -151,7 +150,6 @@ window.addEventListener('hashchange', function() {
         create.style.display = 'block';
         tab1.classList.remove("active-box");
         tab2.classList.add("active-box");
-        console.log('#create');
     } else {
         // デフォルト
         code = 'main';
@@ -161,7 +159,6 @@ window.addEventListener('hashchange', function() {
         tab1.classList.add("active-box");
         tab2.classList.remove("active-box");
         resetHeight();
-        console.log('#none');
     }
 });
 // 初回読み込み時も処理を実行
@@ -223,7 +220,7 @@ function listBox(contestData){
     const result = newListBox.querySelector(`#contestTitle${contestData.virtualContestID}`);
     const regex = new RegExp(filterSearch.value, 'ig');
     const target = contestData.title;
-    if(filterSearch.value && target.match(regex)){
+    if(hash != 'create' && filterSearch.value && target.match(regex)){
         let resultString = target.replace(regex, match => `[[mark class=highlight]]${match}[[/mark]]`);
         resultString = escapeHTML(resultString);
         resultString = resultString.replaceAll('[[mark class=highlight]]', '<mark class="highlight">');
@@ -830,7 +827,7 @@ if (code == 'main') {
     // コンテストをセッションに保存
     function saveContestData(contestData){
         console.log('Save Data:', contestData);
-        sessionStorage.setItem('myContestData', JSON.stringify(data));
+        sessionStorage.setItem('myContestData', JSON.stringify(contestData));
     }
 
     // セッションのデータを取得して自動入力
