@@ -1,40 +1,42 @@
+// apiのurl
 const apiUrl = 'http://localhost:8000/api';
 
-let acquiredData;
-function saveData(data){
-    acquiredData = data;
-    console.log("Acquired Data", acquiredData);
 
-    if (code == 'main'){
-        document.getElementById("sortStart").value = "0-9";
-        displayContestsList('sort', 'start');
-    }else if (code == 'contest'){
-        displayContest(acquiredData);
-    }
+// htmlをエスケープする
+function escapeHTML(text){
+    let result = text;
+    result = result.replaceAll("&", "&amp;");
+    result = result.replaceAll("<", "&lt;");
+    result = result.replaceAll(">", "&gt;");
+    result = result.replaceAll('"', "&quot;");
+    result = result.replaceAll("'", "&#39;");
+    result = result.replaceAll("`", "&#96;");
+    return result;
 }
 
+// unixTimeを YYYY-MM-DD HH-MM-SS (day) に変換
 function formatTime(unixTime) {
     const date = new Date(unixTime * 1000);
 
     const formattedDate = date.getFullYear() + '-' +
         ('0' + (date.getMonth() + 1)).slice(-2) + '-' +
         ('0' + date.getDate()).slice(-2);
-    
     const formattedTime = ('0' + date.getHours()).slice(-2) + ':' +
         ('0' + date.getMinutes()).slice(-2) + ':' +
         ('0' + date.getSeconds()).slice(-2);
-    
     const formattedDay = date.toLocaleDateString('en-US', { weekday: 'short' });
     
     return `${formattedDate} ${formattedTime} (${formattedDay})`;
 }
 
+// 現在のunixTime
 function currentUnixTime() {
     const currentDateTime = new Date();
     const unixTime = Date.parse(currentDateTime) / 1000;
     return unixTime;
 }
 
+// 秒数を DDMMHHSS に変換
 function secondsToDDHHMMSS(seconds) {
     const absSeconds = Math.abs(seconds);
     const days = Math.floor(absSeconds / 86400);
@@ -56,63 +58,7 @@ function secondsToDDHHMMSS(seconds) {
     return seconds < 0 ? `-${formattedTime}` : formattedTime;
 }
 
-function displayRightBottomTime(unixTime){
-    const clock = document.getElementById("clock");
-    clock.innerHTML = formatTime(unixTime);
-}
-displayRightBottomTime(currentUnixTime());
-
-setInterval(() => {
-    displayRightBottomTime(currentUnixTime());
-    // console.log(formatTime(currentUnixTime()));
-}, 200);
-
-
-let code = 'main';
-// urlの#によって表示する要素を変更
-window.addEventListener('hashchange', function() {
-    var hash = window.location.hash.substring(1); // # を取り除く
-    // console.log(hash);
-    // #?の順の時だと#以降は全て#になってしまうので、これが必要
-    // hash = hash.split('?')[0];
-    // console.log(hash);
-    var list = document.getElementById('list');
-    var contest = document.getElementById('contest');
-    var create = document.getElementById('create');
-
-    // コンテンツの表示/非表示を切り替え
-    if (hash === 'list') {
-        code = 'main';
-        list.style.display = 'block';
-        contest.style.display = 'none';
-        create.style.display = 'none';
-        console.log("#list");
-    } else if (hash === 'contest') {
-        code = 'contest';
-        list.style.display = 'none';
-        contest.style.display = 'block';
-        create.style.display = 'none';
-        console.log("#contest");
-    } else if (hash === 'create') {
-        code = 'main';
-        list.style.display = 'none';
-        contest.style.display = 'none';
-        create.style.display = 'block';
-        console.log("#create");
-    } else {
-        // ハッシュが未定義の場合や対応するものがない場合のデフォルト設定
-        code = 'main';
-        list.style.display = 'block';
-        contest.style.display = 'none';
-        create.style.display = 'none';
-        console.log("#none");
-    }
-});
-
-// 初回読み込み時も処理を実行
-window.dispatchEvent(new Event('hashchange'));
-
-
+// 難易度を色に変換
 function diffToColor(difficulty){
     switch (true) {
         case 2800 <= difficulty:
@@ -137,18 +83,102 @@ function diffToColor(difficulty){
 }
 
 
+// 右下の時計を表示
+function displayRightBottomTime(unixTime){
+    const clock = document.getElementById("clock");
+    clock.textContent = formatTime(unixTime);
+}
+displayRightBottomTime(currentUnixTime());
+// 時計を定期的に更新
+setInterval(() => {
+    displayRightBottomTime(currentUnixTime());
+    // console.log(formatTime(currentUnixTime()));
+}, 200);
+
+// 取得したデータを保存しておく
+let acquiredData;
+function saveData(data){
+    acquiredData = data;
+    console.log('Acquired Data', acquiredData);
+    // コンテストリスト/コンテスト
+    if (code == 'main'){
+        document.getElementById("sortStart").value = "0-9";
+        displayContestsList('sort', 'start');
+        // setInterval(() => {
+        //     displayContestsList();
+        // }, 200);
+    }else if (code == 'contest'){
+        displayContest(acquiredData);
+    }
+}
+
+let code = 'main';
+let hash = '';
+// urlの#によって表示する要素を変更
+window.addEventListener('hashchange', function() {
+    // # を取り除く
+    hash = window.location.hash.substring(1);
+    console.log(`#${hash}`);
+    // #?の順の時だと#以降は全て#になってしまうので、以下が必要
+    // hash = hash.split('?')[0];
+    // console.log(hash);
+    const list = document.getElementById("list");
+    const contest = document.getElementById("contest");
+    const create = document.getElementById("create");
+    const tab1 = document.getElementById("tab1");
+    const tab2 = document.getElementById("tab2");
+    // コンテンツの表示/非表示を切り替え
+    if (hash === 'list' || hash === 'running' || hash === 'upcoming' || hash === 'recent') {
+        code = 'main';
+        list.style.display = 'block';
+        contest.style.display = 'none';
+        create.style.display = 'none';
+        tab1.classList.add("active-box");
+        tab2.classList.remove("active-box");
+        resetHeight();
+    } else if (hash === 'contest' || hash === 'problems' || hash === 'ranking') {
+        code = 'contest';
+        list.style.display = 'none';
+        contest.style.display = 'block';
+        create.style.display = 'none';
+        tab1.classList.add("active-box");
+        tab2.classList.remove("active-box");
+    } else if (hash === 'create') {
+        code = 'main';
+        list.style.display = 'none';
+        contest.style.display = 'none';
+        create.style.display = 'block';
+        tab1.classList.remove("active-box");
+        tab2.classList.add("active-box");
+    } else {
+        // デフォルト
+        code = 'main';
+        list.style.display = 'block';
+        contest.style.display = 'none';
+        create.style.display = 'none';
+        tab1.classList.add("active-box");
+        tab2.classList.remove("active-box");
+        resetHeight();
+    }
+});
+// 初回読み込み時も処理を実行
+window.dispatchEvent(new Event('hashchange'));
+
+// コンテストデータをhtmlボックス(div)に
 function listBox(contestData){
     const currentTime = currentUnixTime();
     const startTime = contestData.startAt;
     const endTime = contestData.startAt + contestData.durationSecond;
 
     const newListBox = document.createElement('div');
-    newListBox.classList.add('listGroup');
+    newListBox.classList.add("listGroup");
     let itemClass;
+    let timerClass = "";
     if (currentTime < startTime) {
         itemClass = "upcomingContest";
-    } else if (currentTime < endTime){
+    } else if (currentTime <= endTime){
         itemClass = "runningContest";
+        timerClass = " timerRunning";
     } else {
         itemClass = "recentContest";
     }
@@ -159,12 +189,15 @@ function listBox(contestData){
         diffBox += `<div class="diffBox diff${diffToColor(problem.difficulty)}"></div>`;
     });
 
+    // ボックスのhtml
     newListBox.innerHTML = `
         <a class="listLink" href="virtual_contest.html?ID=${contestData.virtualContestID}#contest"></a>
         <div class="listItem ${itemClass}">
-            <p class="title">${contestData.title}</p>
+            <p class="title" id="contestTitle${contestData.virtualContestID}"></p>
             <p class="space"></p>
             <p class="time">${formatTime(startTime)}</p>
+            <p class="space"></p>
+            <p class="timer${timerClass}" id="timer${contestData.virtualContestID}"></p>
             <p class="space"></p>
             <p class="time">${formatTime(endTime)}</p>
             <p class="space"></p>
@@ -173,18 +206,55 @@ function listBox(contestData){
             <div class="diff">${diffBox}</div>
         </div>
     `;
+    
+    // 開催中の場合、進捗を円で表示
+    if(itemClass == "runningContest"){
+        const timer = newListBox.querySelector(`#timer${contestData.virtualContestID}`);
+        timer.style.setProperty('--percent', `${(endTime-currentUnixTime()) / contestData.durationSecond * 100}%`);
+        setInterval(() => {
+            timer.style.setProperty('--percent', `${(endTime-currentUnixTime()) / contestData.durationSecond * 100}%`);
+        }, 200);
+    }
+
+    // 検索の一致をハイライト
+    const result = newListBox.querySelector(`#contestTitle${contestData.virtualContestID}`);
+    const regex = new RegExp(filterSearch.value, 'ig');
+    const target = contestData.title;
+    if(hash != 'create' && filterSearch.value && target.match(regex)){
+        let resultString = target.replace(regex, match => `[[mark class=highlight]]${match}[[/mark]]`);
+        resultString = escapeHTML(resultString);
+        resultString = resultString.replaceAll('[[mark class=highlight]]', '<mark class="highlight">');
+        result.innerHTML = resultString.replaceAll('[[/mark]]', '</mark>');
+
+        // // const markRegex = new RegExp("\[\[mark class=highlight\]\]([^[]+?)\[\[/mark\]\]", "g")
+        // // result.innerHTML = resultString.replace(markRegex, match => `<mark class="highlight">${match}</mark>`)
+
+
+        // const text = escapeHTML(target);
+        // result.innerHTML = text.replace(regex, match => `<mark class="highlight">${match}</mark>`);
+
+        
+        // let resultString = target;
+        // result.innerHTML = resultString.replace(regex, match => {
+        //     resultString = escapeHTML(resultString);
+        //     return `<mark class="highlight">${match}</mark>`
+        // });
+    }else{
+        result.textContent = target;
+    }
 
     return newListBox;
 }
 
-
-function timeAutoInput(place = "create", type = "Start"){
+// 時間を他の2つに合わせて自動入力
+// 引数: place = ("create", "edit"), type = ('Start', 'Duration', 'End')
+function timeAutoInput(place = "create", type = 'Start'){
     const startTime = document.getElementById(`${place}StartTime`).value;
     const durationTime = document.getElementById(`${place}DurationTime`).value;
     const endTime = document.getElementById(`${place}EndTime`).value;
     const unixStartTime = Date.parse(startTime) / 1000;
     const unixEndTime = Date.parse(endTime) / 1000;
-    if(type == "Start" || type == "Duration"){
+    if(type == 'Start' || type == 'Duration'){
         let durationSecond;
         if(durationTime){
             durationSecond = durationTime * 60;
@@ -199,7 +269,7 @@ function timeAutoInput(place = "create", type = "Start"){
         const hours = convertedDateTime.getHours().toString().padStart(2, '0');
         const minutes = convertedDateTime.getMinutes().toString().padStart(2, '0');
         document.getElementById(`${place}EndTime`).value = `${year}-${month}-${day}T${hours}:${minutes}`;
-    }else if(type == "End"){
+    }else if(type == 'End'){
         let durationSecond = unixEndTime - unixStartTime;
         if(durationSecond >= 0){
             document.getElementById(`${place}DurationTime`).value = durationSecond / 60;
@@ -210,12 +280,15 @@ function timeAutoInput(place = "create", type = "Start"){
         }
     }
 }
+
+// ID,problemを入力する箱を追加
 let addDivIndex = {
     "createName": 0,
     "createPro": 0,
     "editName": 0,
     "editPro": 0
 }
+// 引数: type = ("createName", "createPro", "editName", "editPro")
 function addDiv(type = "createName"){
     const container = document.getElementById(`${type}BoxContainer`);
     addDivIndex[type] ++;
@@ -240,7 +313,7 @@ function addDiv(type = "createName"){
                     ID
                 </label>
             </div>
-            <div class="diffSpace"></div>
+            <div class="stringSpace"></div>
             <select class="${type}Select" id="${type}Select${divIndex}">
                 <option value="Gray">Gray</option>
                 <option value="Brown">Brown</option>
@@ -257,23 +330,32 @@ function addDiv(type = "createName"){
     }
     container.appendChild(newBoxGroup);
 }
+
+// 入力ボックスを消す
+// 引数: button = 消す要素のボタン, type = 同上
 function removeDiv(button, type = "createName"){
     const container = document.getElementById(`${type}BoxContainer`);
     const group = button.parentNode;
     container.removeChild(group);
 }
-function switchPro(proBoxId = 0, type = "createPro"){
+
+// problem入力ボックスの 色,問題ID の表示を切り替え
+// 引数: proBoxId = 箱のID, type = ("createPro", "editPro")
+function switchPro(proBoxId, type = "createPro"){
     const togglePro = document.getElementById(`${type}Toggle${proBoxId}`).checked;
     const selectBox = document.getElementById(`${type}Select${proBoxId}`);
     const textBox = document.getElementById(`${type}Text${proBoxId}`);
     if(togglePro){
-        selectBox.style.display = "none";
-        textBox.style.display = "block";
+        selectBox.style.display = 'none';
+        textBox.style.display = 'block';
     }else{
-        selectBox.style.display = "block";
-        textBox.style.display = "none";
+        selectBox.style.display = 'block';
+        textBox.style.display = 'none';
     }
 }
+
+// データを作成,編集画面に自動入力
+// 引数: data = 入力するデータ, place = ("create", "edit")
 function autoInput(data, place = "create"){
     document.getElementById(`${place}Title`).value = data.title;
 
@@ -322,6 +404,9 @@ function autoInput(data, place = "create"){
         select.value = diffToColor(problems[index].difficulty);
     });
 }
+
+// データを取得
+// 引数: place = ("create", "edit")
 function pickData(place = "create"){
     const startTime = document.getElementById(`${place}StartTime`).value;
     const startAt = Date.parse(startTime) / 1000;
@@ -355,11 +440,12 @@ function pickData(place = "create"){
         "members": members,
         "problems": problems
     };
-    console.log("Pick Data", data);
+    console.log('Pick Data', data);
     return data;
 }
 
-
+// データを並び替え,絞り込み
+// 引数: data = コンテストリスト, method = ('sort', 'filter'), keyword = sortの時に、参照するセレクトボックス('title', 'start', 'end')
 let sortTag = 'start';
 function convertData(data, method = 'filter', keyword = ''){
     const sortTitle = document.getElementById("sortTitle");
@@ -367,21 +453,26 @@ function convertData(data, method = 'filter', keyword = ''){
     const sortEnd = document.getElementById("sortEnd");
     const filterSearch = document.getElementById("filterSearch");
     const filterVisible = document.getElementById("filterVisible");
-
+    
+    // 並び替え方法を保存
     if(method == 'sort'){
         sortTag = keyword;
     }
 
     let newData = data;
-    // newData = newData.filter(item => item.visible == "All");
-    // newData = newData.filter(item => item.title.includes(filterSearch.value));
-    const regex = new RegExp(filterSearch.value, "i");
-    newData = newData.filter(item => JSON.stringify(item.title).match(regex));
-
+    
+    // visibleで絞り込み
     if(filterVisible.value != "none"){
         newData = newData.filter(item => item.visible == filterVisible.value);
     }
+    // newData = newData.filter(item => item.visible == "All");
+    
+    // 検索
+    const regex = new RegExp(filterSearch.value, 'ig');
+    newData = newData.filter(item => JSON.stringify(item.title).match(regex));
 
+    // 並べ替える
+    // noneを選択すると自動で開始時刻昇順になる
     if(sortTag == 'title'){
         // sortTitle.value = "none";
         sortStart.value = "none";
@@ -423,39 +514,51 @@ function convertData(data, method = 'filter', keyword = ''){
     return newData;
 }
 
+// コンテストのリストを表示
+// 引数: 同上
 function displayContestsList(method = 'filter', keyword = '') {
-    listContainer1.innerHTML = "<h3>Upcoming Contests</h3>";
-    listContainer2.innerHTML = "<h3>Running Contests</h3>";
-    listContainer3.innerHTML = "<h3>Recent Contests</h3>";
+    const upcoming = document.getElementById("upcoming");
+    const running = document.getElementById("running");
+    const recent = document.getElementById("recent");
+    upcoming.innerHTML = '<h3>Upcoming Contests<a href="virtual_contest.html#upcoming"></a></h3>';
+    running.innerHTML = '<h3>Running Contests<a href="virtual_contest.html#running"></a></h3>';
+    recent.innerHTML = '<h3>Recent Contests<a href="virtual_contest.html#recent"></a></h3>';
     const currentTime = currentUnixTime();
-    const container1 = document.getElementById("listContainer1");
-    const container2 = document.getElementById("listContainer2");
-    const container3 = document.getElementById("listContainer3");
 
     convertData(acquiredData, method, keyword).forEach(item => {
         // console.log(item);
-
         const startTime = item.startAt;
         const endTime = item.startAt + item.durationSecond;
 
         const newListBox = listBox(item);
 
         if (currentTime < startTime) {
-            container1.appendChild(newListBox);
-        } else if (currentTime < endTime){
-            container2.appendChild(newListBox);
+            upcoming.appendChild(newListBox);
+        } else if (currentTime <= endTime){
+            running.appendChild(newListBox);
         } else {
-            container3.appendChild(newListBox);
+            recent.appendChild(newListBox);
         }
+    });
+    resetHeight();
+}
+
+// 進捗円の高さを調整
+function resetHeight(){
+    const timers = document.querySelectorAll(".timerRunning");
+    timers.forEach(timer => {
+        const width = window.getComputedStyle(timer).width;
+        timer.style.height = width;
     });
 }
 
-
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+// メインページの時のみ実行する関数
 if (code == 'main') {
-    console.log("#list2");
+    console.log('#list2');
     
+    // コンテストリストを取得
     function getContestsList(){
         console.log(`${apiUrl}/virtual_contests`);
         fetch(`${apiUrl}/virtual_contests`, {
@@ -474,10 +577,11 @@ if (code == 'main') {
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+// コンテストページの時のみ実行する関数
 if (code == 'contest') {
-    console.log("#contest2");
+    console.log('#contest2');
 
-    // クエリパラメータを取得する関数
+    // クエリパラメータを取得
     function getQueryParameter(parameterName) {
         const queryString = window.location.search;
         // console.log(queryString);
@@ -488,10 +592,12 @@ if (code == 'contest') {
             return '1';
         }
     }
-
-    const virtualContestID = getQueryParameter("ID");
+    const virtualContestID = getQueryParameter('ID');
     console.log(virtualContestID);
+    document.getElementById("problems").innerHTML = `Problems<a href="virtual_contest.html?ID=${virtualContestID}#problems"></a>`;
+    document.getElementById("ranking").innerHTML = `Ranking<a href="virtual_contest.html?ID=${virtualContestID}#ranking"></a>`;
 
+    // コンテストの情報を取得
     function getContest(){
         console.log(`${apiUrl}/virtual_contests/${virtualContestID}`);
         fetch(`${apiUrl}/virtual_contests/${virtualContestID}`, {
@@ -506,6 +612,7 @@ if (code == 'contest') {
             .catch(error => console.error('GET Error:', error.message));
     }
 
+    // コンテストの状態を表示
     function displayLimit(data){
         const currentTime = currentUnixTime();
         const startTime = data.startAt;
@@ -514,20 +621,23 @@ if (code == 'contest') {
         let limitContent;
         if (currentTime < startTime) {
             limitContent = `<p class="timeS">開始まで:</p><p>${secondsToDDHHMMSS(startTime-currentTime)}</p>`;
-        } else if (currentTime < endTime){
+        } else if (currentTime <= endTime){
             limitContent = `<p class="timeS">終了まで:</p><p>${secondsToDDHHMMSS(endTime-currentTime)}</p>`;
         } else {
             limitContent = `<p class="timeS">終了から:</p><p>${secondsToDDHHMMSS(currentTime-endTime)}</p>`;
         }
-        limitTime.innerHTML = `${limitContent}`;
+        document.getElementById("limitTime").innerHTML = `${limitContent}`;
     }
     
+    let contestStartTime;
+    // コンテストの情報を表示
     function displayContest(data) {
         const startTime = data.startAt;
+        contestStartTime = startTime;
         const endTime = data.startAt + data.durationSecond;
         
-        contestTimes.innerHTML =`
-            <h2>${data.title}</h2>
+        document.getElementById("contestTimes").innerHTML =`
+            <h2 id="titleContent"></h2>
             <div>
                 <div class="time">
                     <p class="timeS">Start:</p><p>${formatTime(startTime)}</p>
@@ -538,43 +648,69 @@ if (code == 'contest') {
                 <div id="limitTime" class="time"></div>
             </div>
         `;
-        members.innerHTML = `${data.members.map((listItem, index) => `<li>${listItem}</li>`).join('')}`;
+        const titleContent =  document.getElementById("titleContent");
+        titleContent.textContent = data.title;
+        const newA = document.createElement('a');
+        newA.href = `virtual_contest.html?ID=${data.virtualContestID}#contest`;
+        titleContent.appendChild(newA);
 
         displayLimit(acquiredData);
         setInterval(() => {
             displayLimit(acquiredData);
         }, 200);
 
+        const membersContent = document.getElementById("membersContent");
+        membersContent.textContent = "";
+        data.members.forEach(member => {
+            const newLi = document.createElement('li');
+            newLi.textContent = member;
+            membersContent.appendChild(newLi);
+        });
+
+        // problemのtable 2つに問題の情報を表示
         const problemsBody = document.getElementById("problemsBody");
         const resultHeadRow = document.getElementById("resultHeadRow");
-        problemsBody.innerHTML = "";
-        resultHeadRow.innerHTML = "<th></th><th>Name</th><th>Score</th>";
+        problemsBody.textContent = "";
+        resultHeadRow.innerHTML = '<th class="index"></th><th class="name">Name</th><th class="totalScore">Score</th>';
 
         const problems = data.problems;
         problems.forEach((problem, index) => {
             const url = `https://atcoder.jp/contests/${problem.contestID}/tasks/${problem.problemID}`;
             const newRow = document.createElement('tr');
             newRow.innerHTML = `
-                <th class="diff${diffToColor(problem.difficulty)}">
+                <th class="index diffBox diff${diffToColor(problem.difficulty)}">
                     <a href="${url}" rel="noopener" target="_blank" class="proLink">${index + 1}</a>
                 </th>
                 <td>
-                    <a href="${url}" rel="noopener" target="_blank">${problem.name}</a>
+                    <a href="${url}" rel="noopener" target="_blank" id="problemName${index + 1}" class="title"></a>
                 </td>
-                <td>${problem.point}</td>
+                <td class="point">${problem.point}</td>
             `;
+            newRow.querySelector(`#problemName${index + 1}`).textContent = problem.name;
             
             problemsBody.appendChild(newRow);
 
             const newHead = document.createElement('th');
-            newHead.textContent = index + 1;
+            newHead.classList.add("scores");
+            newHead.classList.add("diffBox");
+            newHead.classList.add(`diff${diffToColor(problem.difficulty)}`);
+            newHead.innerHTML = `<a href="${url}" rel="noopener" target="_blank" class="proLink">${index + 1}</a>`;
             resultHeadRow.appendChild(newHead);
         });
-        autoInput(data, 'edit');
+        // 背景色を透過
+        const diffBoxes = document.querySelectorAll(".diffBox");
+        diffBoxes.forEach(diffBox => {
+            const currentColor = window.getComputedStyle(diffBox).backgroundColor;
+            const newColor = currentColor.replace("rgb", "rgba").replace(")", ", " + 0.6 + ")");
+            diffBox.style.backgroundColor = newColor;
+        });
+
+        autoInput(data, "edit");
     }
 
+    // コンテスト結果を取得
     function getResult(){
-        console.log(`${apiUrl}/virtual_contests/standings/${virtualContestID}`);
+        // console.log(`${apiUrl}/virtual_contests/standings/${virtualContestID}`);
         fetch(`${apiUrl}/virtual_contests/standings/${virtualContestID}`, {
             // mode: 'no-cors',
             method: 'GET',
@@ -586,113 +722,97 @@ if (code == 'contest') {
             .then(data => displayResult(data))
             .catch(error => console.error('GET Error:', error.message));
     }
+    // コンテスト結果を表示
     function displayResult(data) {
         const resultBody = document.getElementById("resultBody");
+        resultBody.innerHTML = "";
+        // スコア順に並べ替え
         data.sort((a, b) => b.point - a.point);
-
         data.forEach((member, index) => {
             const newRow = document.createElement('tr');
+            let timeString = "";
+            if(member.time >= contestStartTime){
+                timeString = secondsToDDHHMMSS(member.time-contestStartTime);
+            }
             newRow.innerHTML = `
                 <th>${index + 1}</th>
-                <td>${member.atcoderID}</td>
-                <td>${member.point}</td>
+                <td id="atcoderID${index + 1}"></td>
+                <td>
+                    <div class="score" id="totalScore${index + 1}">${member.point}</div>
+                    <div class="time">${timeString}</div>
+                </td>
             `;
+            newRow.querySelector(`#atcoderID${index + 1}`).textContent = member.atcoderID;
             
             const problems = member.problems;
-            
+            let penalties = 0;
             problems.forEach(problem => {
+                const penalty = problem.penalty;
+                penalties += penalty;
+                let penaltyString = "";
+                if(penalty > 0){
+                    penaltyString = `<span class="penalty">(${penalty})</span>`;
+                }
                 const newEachScore = document.createElement('td');
                 if (problem.accepted) {
-                    newEachScore.textContent = problem.point;
-                } else {
-                    newEachScore.textContent = "";
+                    newEachScore.innerHTML = `
+                        <div class="score">${problem.point}${penaltyString}</div>
+                        <div class="time">${secondsToDDHHMMSS(problem.time-contestStartTime)}</div>
+                    `;
                 }
                 newRow.appendChild(newEachScore);
             });
+
+            if(penalties > 0){
+                newRow.querySelector(`#totalScore${index + 1}`).innerHTML += `<span class="penalty">(${penalties})</span>`;
+            }
+
             resultBody.appendChild(newRow);
         });
+        // 更新時刻を表示
+        console.log(`Result at ${formatTime(currentUnixTime())}`, data);
+        document.getElementById("reloadTime").textContent = `${formatTime(currentUnixTime())} 最終更新`;
     }
     getContest();
     getResult();
+    // 定期的に結果を更新
+    setInterval(() => {
+        getResult();
+    }, 10000);
 
+    // コンテストの表示,編集を切り替え
     function switchEdit(){
         const toggleEdit = document.getElementById("toggleEdit").checked;
         if(toggleEdit){
-            document.documentElement.style.setProperty('--displayView',"none");
-            document.documentElement.style.setProperty('--displayEdit',"block");
+            document.documentElement.style.setProperty('--displayView','none');
+            document.documentElement.style.setProperty('--displayEdit','block');
         }else{
-            document.documentElement.style.setProperty('--displayView',"block");
-            document.documentElement.style.setProperty('--displayEdit',"none");
+            document.documentElement.style.setProperty('--displayView','block');
+            document.documentElement.style.setProperty('--displayEdit','none');
         }
     }
+    // ページを表示して少ししたら確認
+    // "戻る"でedit状態に移行した際に反映させる為
     setTimeout(() => {
         switchEdit();
     }, 8);
 
-    // const dummyData = [
-    //     {
-    //         "atcoderID": "inukaki",
-    //         "point": 600,
-    //         "problems": [
-    //             {
-    //             "point": 100
-    //             },
-    //             {
-    //             "point": 200
-    //             },
-    //             {
-    //             "point": 300
-    //             }
-    //         ]
-    //     },
-    //     {
-    //         "atcoderID": "maisuma",
-    //         "point": 900,
-    //         "problems": [
-    //             {
-    //             "point": 150
-    //             },
-    //             {
-    //             "point": 300
-    //             },
-    //             {
-    //             "point": 450
-    //             }
-    //         ]
-    //     },
-    //     {
-    //         "atcoderID": "eskrmc",
-    //         "point": 300,
-    //         "problems": [
-    //             {
-    //             "point": 50
-    //             },
-    //             {
-    //             "point": 100
-    //             },
-    //             {
-    //             "point": 150
-    //             }
-    //         ]
-    //     }
-    // ];
-    // displayResult(dummyData);
-
-    
+    // コンテスト編集を送信
     function editContest(){
-        // POSTリクエストを送信
+        // PUTリクエストを送信
         fetch(`${apiUrl}/virtual_contests/${virtualContestID}`, {
             // mode: 'no-cors',
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(pickData('edit')),
+            body: JSON.stringify(pickData("edit")),
         })
             .then(response => response.json())
             .then(data => editSuccess(data))
-            .catch(error => console.error('POST Error:', error));
+            .catch(error => console.error('PUT Error:', error));
     }
+    // 編集成功したらページをリロード
     function editSuccess(data){
         window.location.reload();
     }
@@ -700,30 +820,30 @@ if (code == 'contest') {
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+// メインページの時のみ実行する関数
 if (code == 'main') {
-    console.log("#create2");
+    console.log('#create2');
 
-
-    function saveContestData(data){
-        console.log("Save Data:", data);
-        sessionStorage.setItem('myContestData', JSON.stringify(data));
+    // コンテストをセッションに保存
+    function saveContestData(contestData){
+        console.log('Save Data:', contestData);
+        sessionStorage.setItem('myContestData', JSON.stringify(contestData));
     }
 
+    // セッションのデータを取得して自動入力
     function loadContestData(){
-        var myContestData = JSON.parse(sessionStorage.getItem('myContestData'));
-        console.log("Load Data:", myContestData);
+        const myContestData = JSON.parse(sessionStorage.getItem('myContestData'));
+        console.log('Load Data:', myContestData);
         if(myContestData){
-            autoInput(myContestData, 'create');
+            autoInput(myContestData, "create");
         }else{
-            addDiv('createName');
-            addDiv('createName');
-            addDiv('createPro');
-            addDiv('createPro');
+            addDiv("createName");
+            addDiv("createName");
+            addDiv("createPro");
+            addDiv("createPro");
         }
     }
     loadContestData();
-
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
     // ページ読み込み時に現在時刻を設定
     window.onload = function() {
@@ -734,14 +854,12 @@ if (code == 'main') {
         const day = currentDateTime.getDate().toString().padStart(2, '0');
         const hours = currentDateTime.getHours().toString().padStart(2, '0');
         const minutes = currentDateTime.getMinutes().toString().padStart(2, '0');
-
         // 現在時刻をフォーマットして設定
         document.getElementById("createStartTime").value = `${year}-${month}-${day}T${hours}:${minutes}`;
-        timeAutoInput('create', 'Start');
+        timeAutoInput("create", 'Start');
     };
     
-    //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
+    // コンテスト作成を送信
     function createContest(){
         // POSTリクエストを送信
         fetch(`${apiUrl}/virtual_contests`, {
@@ -750,20 +868,32 @@ if (code == 'main') {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(pickData('create')),
+            body: JSON.stringify(pickData("create")),
         })
             .then(response => response.json())
-            // .then(data => console.log('POST Response:', data))
             .then(data => createSuccess(data))
-            .catch(error => console.error('POST Error:', error));
+            // .then(data => console.log('POST Response:', data))
+            .catch(error => {
+                createError();
+                console.error('POST Error:', error);
+            });
     }
-
+    // 作成したコンテストを表示
     function createSuccess(data) {
+        // 最後に作成したコンテストをセッションに保存
         saveContestData(data);
-        const notice = document.getElementById('createDisplay');
+        const notice = document.getElementById("createDisplay");
         const newP = document.createElement('p');
-        newP.innerHTML = 'Create Successfully!';
+        newP.textContent = 'Create Successfully!';
         notice.appendChild(newP);
         notice.appendChild(listBox(data));
+        resetHeight();
+    }
+    // 作成失敗時のアラート
+    function createError(){
+        const notice = document.getElementById("createDisplay");
+        const newP = document.createElement('p');
+        newP.textContent = 'Create Failed';
+        notice.appendChild(newP);
     }
 }

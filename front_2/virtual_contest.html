@@ -9,15 +9,15 @@
   </head>
   <body>
     <header>
-      <h1>Virtual Contest</h1>
-      <!-- ページ内リンク等のナビゲーション -->
+      <h1>Virtual Contest<a href="virtual_contest.html"></a></h1>
+      <!-- ナビゲーション -->
       <nav class="selector">
         <ul class="nav nav-tabs">
-          <li class="nav-item active-box">
+          <li id="tab1" class="nav-item active-box">
             <p>Contests</p>
             <a class="nav-link active" href="virtual_contest.html#list"></a>
           </li>
-          <li class="nav-item">
+          <li id="tab2" class="nav-item">
             <p>Create</p>
             <a class="nav-link" href="virtual_contest.html#create"></a>
           </li>
@@ -25,12 +25,13 @@
       </nav>
     </header>
     <main>
+      <!-- 時刻表示 -->
       <section id="right-bottom">
         <div id="clock"></div>
       </section>
       <!-- list -->
       <section id="list">
-        <div id="listContainer0" class="conatiner">
+        <div id="listContainer0" class="container">
           <div class="listGroup">
             <a></a>
             <div class="listItem">
@@ -38,15 +39,23 @@
               <p class="space"></p>
               <p class="time">Start</p>
               <p class="space"></p>
+              <p class="timer">Timer</p>
+              <p class="space"></p>
               <p class="time">End</p>
               <p class="space"></p>
               <p class="memNum">Members</p>
               <p class="space"></p>
-              <div class="diff">Difficulty</div>
+              <div class="diff">
+                <p class="diff"></p>
+                <p>Difficulty</p>
+                <p class="diff"></p>
+                <p class="diff"></p>
+              </div>
             </div>
           </div>
         </div>
-        <div id="listContainer000" class="conatiner">
+        <!-- 並び替え,絞り込み -->
+        <div id="listContainer000" class="container">
           <div class="listGroup">
             <div class="listItem">
               <div class="title">
@@ -69,6 +78,8 @@
                   </select>
                 </div>
               </div>
+              <p class="space"></p>
+              <p class="timer"></p>
               <p class="space"></p>
               <div class="time">
                 <div class="sort-filter">
@@ -94,6 +105,8 @@
               <p class="space"></p>
               <p class="time">←正規表現使えます</p>
               <p class="space"></p>
+              <p class="timer"></p>
+              <p class="space"></p>
               <div class="time">
                 <div class="sort-filter">
                   <label for="filterVisible">Visible:</label>
@@ -111,31 +124,41 @@
             </div>
           </div>
         </div>
-        <div id="listContainer2" class="conatiner"><h3>Running Contests</h3></div>
-        <div id="listContainer1" class="conatiner"><h3>Upcoming Contests</h3></div>
-        <div id="listContainer3" class="conatiner"><h3>Recent Contests</h3></div>
+        <div id="running" class="container">
+          <h3>Running Contests
+          <a href="virtual_contest.html#running"></a></h3>
+        </div>
+        <div id="upcoming" class="container">
+          <h3>Upcoming Contests
+          <a href="virtual_contest.html#upcoming"></a></h3>
+        </div>
+        <div id="recent" class="container">
+          <h3>Recent Contests
+          <a href="virtual_contest.html#recent"></a></h3>
+        </div>
       </section>
-      <hr>
       <!-- contest -->
       <section id="contest">
-        <button onclick="getContest()">LOAD</button>
+        <!-- <button onclick="getContest()">LOAD</button> -->
         <div class="switch-container">
           <label class="switch-label" for="toggleEdit">
             View
-            <label class="switch">
+            <div class="switch">
               <input type="checkbox" id="toggleEdit" onchange="switchEdit()">
               <span class="slider"></span>
-            </label>
+            </div>
             Edit
           </label>
         </div>
+        <!-- 編集ボタン -->
         <div class="edit">
           <button onclick="editContest()">Go</button>
         </div>
+        <!-- コンテストタイトル,時間 -->
         <div id="contestHead">
-          <!--  -->
+          <!-- 表示 -->
           <div class="view" id="contestTimes">
-            <h2>title</h2>
+            <h2 id="titleContent">title<a></a></h2>
             <div>
               <div class="time">
                 <p class="timeS">Start:</p><p>startTime</p>
@@ -146,7 +169,7 @@
               <div id="limitTime" class="time">limit</div>
             </div>
           </div>
-          <!--  -->
+          <!-- 編集 -->
           <div class="edit">
             <label for="editTitle">Title:</label>
             <input type="text" id="editTitle" placeholder="Title" value="New Contest">
@@ -169,12 +192,13 @@
 
         </div>
         <h4>Member</h4>
+        <!-- メンバー -->
         <div id="contestMember">
-          <!--  -->
+          <!-- 表示 -->
           <div class="view">
-            <ul id="members">members</ul>
+            <ul id="membersContent">members</ul>
           </div>
-          <!--  -->
+          <!-- 編集 -->
           <div class="edit">
             <div id="editNameBoxContainer">
               <div class="editNameBoxGroup">
@@ -185,22 +209,23 @@
           </div>
 
         </div>
-        <h3>Problems</h3>
+        <h3 id="problems">Problems<a></a></h3>
+        <!-- 問題 -->
         <div id="contestProblems">
-          <!--  -->
+          <!-- 表示 -->
           <div class="view">
             <table class="table">
               <thead>
                 <tr>
-                  <th></th>
-                  <th>Title</th>
-                  <th>Point</th>
+                  <th class="index"></th>
+                  <th class="title">Title</th>
+                  <th class="point">Point</th>
                 </tr>
               </thead>
               <tbody id="problemsBody"></tbody>
             </table>
           </div>
-          <!--  -->
+          <!-- 編集 -->
           <div class="edit">
             <div id="editProBoxContainer">
               <div class="editProBoxGroup">
@@ -214,7 +239,7 @@
                     ID
                   </label>
                 </div>
-                <div class="diffSpace"></div>
+                <div class="stringSpace"></div>
                 <select class="editProSelect" id="editProSelect0">
                   <option value="Gray">Gray</option>
                   <option value="Brown">Brown</option>
@@ -234,15 +259,19 @@
           </div>
 
         </div>
-
+        <!-- 結果表示 -->
         <div class="view">
-          <h3>Ranking</h3>
+          <div class="ranking">
+            <h3 id="ranking">Ranking<a></a></h3>
+            <p class="stringSpace"></p>
+            <p id="reloadTime">更新時刻</p>
+          </div>
           <table class="table">
             <thead>
               <tr id="resultHeadRow">
-                <th></th>
-                <th>Name</th>
-                <th>Score</th>
+                <th class="index"></th>
+                <th class="name">Name</th>
+                <th class="totalScore">Score</th>
               </tr>
             </thead>
             <tbody id="resultBody"></tbody>
@@ -250,7 +279,6 @@
         </div>
 
       </section>
-      <hr>
       <!-- create -->
       <section id="create">
         <label for="createTitle">Title:</label>
@@ -278,10 +306,6 @@
           </div>
         </div>
         <button onclick="addDiv('createName')">+</button>
-        <!-- <div>
-          <button onclick="saveNameList()">SAVE</button>
-          <button onclick="loadNameList()">LOAD</button>
-        </div> -->
         <hr>
         Problems
         <div id="createProBoxContainer">
@@ -296,7 +320,7 @@
                 ID
               </label>
             </div>
-            <div class="diffSpace"></div>
+            <div class="stringSpace"></div>
             <select class="createProSelect" id="createProSelect0">
               <option value="Gray">Gray</option>
               <option value="Brown">Brown</option>
@@ -314,6 +338,7 @@
           <button onclick="addDiv('createPro')">+</button>
         </div>
         <hr>
+        <!-- 作成ボタン -->
         <div>
           <button onclick="createContest()">Create</button>
         </div>

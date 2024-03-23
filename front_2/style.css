@@ -9,8 +9,14 @@
     --backgroundColor: var(--white);
     --borderColor0: var(--black);
     --borderColor1: var(--gray);
-    --borderColor01: #8f8f8f;
-    --empBorderColor: var(--red);
+    --borderColor01: #4f4f4f;
+    --hoverBorderColor: var(--red);
+
+    --highlightColor: #ffff0099;
+    --pieColor: var(--red);
+    --scoreColor: #00af00;
+    --solveTimeColor: #7f7f7f;
+    --penaltyColor: var(--red);
 
     --upcomingColor: #ffe8e8;
     --runningColor: #e8ffe8;
@@ -24,10 +30,14 @@
     --diffYellow: #c0c03d;
     --diffOrange: #ef8733;
     --diffRed: #ea3323;
+    --diffBackgroundColor: #ffffffbb;
     
     --button-width: 48px;
     --button-height: 24px;
-    --button-margin: calc(var(--button-height) / 10);
+    --button-margin: calc(var(--button-height) / 10 + 1px);
+    --buttonBackgroundColor: #cccccc;
+    --buttonColor: var(--white);
+    --buttonBackgroundColorChecked: #2196F3;
 
     --displayView: block;
     --displayEdit: none;
@@ -35,9 +45,86 @@
 body{
     background-color: var(--backgroundColor);
 }
+.highlight{
+    background-color: var(--highlightColor);
+    border-radius: 0.2em;
+    border: 1px solid var(--borderColor1);
+}
+.stringSpace{
+    width: 2em;
+}
+/* スライドボタンここから */
+.switch-container {
+    display: flex;
+    align-items: center;
+}
+.switch-label {
+    margin: auto 0;
+    cursor: pointer;
+}
+.switch {
+    position: relative;
+    display: inline-block;
+    width: var(--button-width);
+    height: var(--button-height);
+}
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--buttonBackgroundColor);
+    -webkit-transition: .2s;
+    transition: .2s;
+    border-radius: calc(var(--button-height) / 2);
+    border: 2px solid #ffffff00;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: calc(var(--button-height) - var(--button-margin) * 2);
+    width: calc(var(--button-height) - var(--button-margin) * 2);
+    left: calc(var(--button-margin) - 2px);
+    bottom: calc(var(--button-margin) - 2px);
+    background-color: var(--buttonColor);
+    -webkit-transition: .2s;
+    transition: .2s;
+    border-radius: 50%;
+}
+input:focus + .slider {
+    border: 2px solid var(--borderColor0);
+}
+input:checked + .slider {
+    background-color: var(--buttonBackgroundColorChecked);
+}
+input:checked + .slider:before {
+    -webkit-transform: translateX(calc(var(--button-width) - var(--button-height)));
+    -ms-transform: translateX(calc(var(--button-width) - var(--button-height)));
+    transform: translateX(calc(var(--button-width) - var(--button-height)));
+}
+/* スライドボタンここまで */
 
+
+/* ヘッダー */
+header h1{
+    position: relative;
+}
+header h1 a{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
 header .selector{
-    margin: 3em 0 1em;
+    margin: 2em 0 1em;
     border-bottom: 1px solid var(--borderColor0);
 }
 header .selector ul{
@@ -50,18 +137,20 @@ header .selector li{
     list-style-type: none;
 }
 header .selector .nav-item{
+    margin: 0 1px -1px;
     width: 10em;
     height: 2em;
     border-radius: 0.2em 0.2em 0 0;
+    border-top: 1px solid var(--borderColor1);
+    border-right: 1px solid var(--borderColor1);
+    border-left: 1px solid var(--borderColor1);
+    /* border: 1px solid var(--borderColor1);
+    border-bottom: 1px solid #ffffff00; */
     position: relative;
 }
 header .selector p{
     margin-top: 0.5em;
     text-align: center;
-    /* position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); */
 }
 header .selector a{
     position: absolute;
@@ -70,22 +159,21 @@ header .selector a{
     width: 100%;
     height: 100%;
 }
-header .selector .nav-item {
-    border: 1px solid var(--borderColor1);
-    border-bottom: 1px solid var(--backgroundColor);
-}
 header .selector .active-box {
     border: 1px solid var(--borderColor0);
     border-bottom: 1px solid var(--backgroundColor);
 }
 header .selector .nav-item:hover{
-    border: 1px solid var(--empBorderColor);
-    border-bottom: 1px solid var(--backgroundColor);
+    border-top: 1px solid var(--hoverBorderColor);
+    border-right: 1px solid var(--hoverBorderColor);
+    border-left: 1px solid var(--hoverBorderColor);
+    /* border: 1px solid var(--hoverBorderColor);
+    border-bottom: 1px solid var(--backgroundColor); */
 }
 
-
+/* 本体 */
 main{
-    width: 98%;
+    width: 96%;
     margin: auto;
 }
 main #right-bottom{
@@ -94,8 +182,6 @@ main #right-bottom{
     right: 0;
     bottom: 0;
     margin: 2em;
-    /* width: 4em; */
-    /* height: 2em; */
     border-radius: 1em;
     border: 1px solid var(--borderColor0);
     background-color: var(--white);
@@ -131,74 +217,19 @@ main #right-bottom #clock{
     background-color: var(--diffRed);
 }
 
-
-/* スライドボタンここから */
-.switch-container {
-    display: flex;
-    align-items: center;
-}
-
-.switch-label {
-    margin: auto 0;
-    cursor: pointer;
-}
-
-.switch {
+main .container h3{
     position: relative;
-    display: inline-block;
-    width: var(--button-width);
-    height: var(--button-height);
 }
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
+main .container a{
     position: absolute;
-    cursor: pointer;
     top: 0;
     left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ccc;
-    -webkit-transition: .2s;
-    transition: .2s;
-    border-radius: calc(var(--button-height) / 2);
-    /* border: 1px solid var(--borderColor1); */
+    width: 100%;
+    height: 100%;
 }
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: calc(var(--button-height) - var(--button-margin) * 2);
-    width: calc(var(--button-height) - var(--button-margin) * 2);
-    left: var(--button-margin);
-    bottom: var(--button-margin);
-    background-color: white;
-    -webkit-transition: .2s;
-    transition: .2s;
-    border-radius: 50%;
-}
-
-input:checked + .slider {
-    background-color: #2196F3;
-}
-
-input:focus + .slider {
-    box-shadow: 0 0 1px #2196F3;
-}
-
-input:checked + .slider:before {
-    -webkit-transform: translateX(calc(var(--button-width) - var(--button-height)));
-    -ms-transform: translateX(calc(var(--button-width) - var(--button-height)));
-    transform: translateX(calc(var(--button-width) - var(--button-height)));
-}
-/* スライドボタンここまで */
-
+/* コンテストボックス */
 main .listGroup{
+    /* margin: 0.4em auto; */
     position: relative;
 }
 main .listGroup a{
@@ -212,7 +243,7 @@ main .listGroup a{
     border-radius: 0.3em;
 }
 main .listGroup .listLink:hover{
-    border: 1px solid var(--empBorderColor);
+    border: 1px solid var(--hoverBorderColor);
 }
 main .listGroup .listItem{
     margin: 0.3em auto;
@@ -220,42 +251,59 @@ main .listGroup .listItem{
     display: flex;
     border-radius: 0.3em;
 }
+/* main .listGroup .listItem div{
+    border: 1px dashed var(--borderColor0);
+}
+main .listGroup .listItem p{
+    border: 1px dashed var(--borderColor0);
+} */
 main .listGroup .title{
     margin: auto;
     width: 20%;
 }
 main .listGroup .time{
     margin: auto;
-    font-size: 0.7em;
     width: 15%;
+    font-size: 0.7em;
+}
+main .listGroup .timer{
+    margin: auto;
+    width: 5%;
+    font-size: 0.7em;
+}
+main .listGroup .timerRunning{
+    height: 4em;
+    border-radius: 50%;
+    background: conic-gradient(var(--pieColor) 0% var(--percent, 60%), transparent var(--percent, 60%) 100%);
+    border: 1px solid var(--borderColor0);
 }
 main .listGroup .memNum{
     margin: auto;
+    width: 1%;
     font-size: 0.7em;
-    width: 2%;
 }
 main .listGroup .diff{
     margin: auto;
     font-size: 0.7em;
-    width: 25%;
+    width: 30%;
     display: flex;
 }main .listGroup .diff .diffBox{
-    margin: auto 0;
+    margin: auto 0 auto -1px;
     width: 3em;
     height: 3em;
     border: 1px solid var(--borderColor0);
 }
 main .listGroup .space{
-    width: 2%;
+    width: 1%;
 }
 main .listGroup .sort-filter{
     font-size: 16px;
     display: flex;
 }
 main .listGroup .sort-filter-input{
-    font-size: 16px;
     width: 100%;
     height: 20px;
+    font-size: 16px;
 }
 main .listGroup .upcomingContest{
     background-color: var(--upcomingColor);
@@ -268,6 +316,7 @@ main .listGroup .recentContest{
 }
 
 
+/* コンテストページ */
 .view{
     display: var(--displayView);
 }
@@ -275,33 +324,59 @@ main .listGroup .recentContest{
     display: var(--displayEdit);
 }
 
-/* #contestHead{
-    height: 14em;
-} */
+main #titleContent{
+    position: relative;
+}
+main #titleContent a{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
 main #contestHead .time{
     display: flex;
 }
 main #contestHead .time .timeS{
     width: 6em;
 }
-/* #contestMember{
-    height: 10em;
-} */
-main #members li{
+main #membersContent li{
     list-style-type: decimal;
 }
-/* #contestProblems{
-    height: 20em;
-} */
+main #problems{
+    position: relative;
+}
+main #problems a{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+main .ranking{
+    display: flex;
+}
+main #ranking{
+    position: relative;
+}
+main #ranking a{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+main .ranking #reloadTime{
+    margin: auto 0;
+}
 main .table{
     width: 100%;
-    margin-bottom: 1rem;
+    /* margin-bottom: 1rem; */
     color: var(--black);
     border-collapse: collapse;
-    text-indent: initial;
-    border-spacing: 2px;
+    /* text-indent: initial;
+    border-spacing: 2px; */
     line-height: 1.5;
-    border-radius: 10em;
     border: 2px solid var(--borderColor01);
 }
 main .table th{
@@ -310,19 +385,44 @@ main .table th{
 main .table td{
     border: 2px solid var(--borderColor01);
 }
+main .table .index{
+    width: 5%;
+}
+main .table .title{
+    width: 70%;
+}
+main .table .point{
+    width: 25%;
+}
+main .table .name{
+    width: 10%;
+}
+main .table .totalScore{
+    width: 5%;
+}
+main .table .scores{
+    width: auto;
+}
+main .table .score{
+    text-align: center;
+    color: var(--scoreColor);
+}
+main .table .time{
+    text-align: center;
+    color: var(--solveTimeColor);
+}
+main .table .penalty{
+    color: var(--penaltyColor);
+}
 main .proLink{
-    background-color: #ffffffbb;
+    background-color: var(--diffBackgroundColor);
 }
 
 
+
+/* 作成,編集 */
 .createProBoxGroup{
     display: flex;
-}
-.editProBoxGroup{
-    display: flex;
-}
-.diffSpace{
-    width: 2em;
 }
 .createProSelect{
     display: block;
@@ -330,6 +430,9 @@ main .proLink{
 .createProText{
     display: none;
     width: 6em;
+}
+.editProBoxGroup{
+    display: flex;
 }
 .editProSelect{
     display: block;
